@@ -1,0 +1,244 @@
+openapi: 3.0.2
+
+info:
+  title: "CloudStack"
+  description: |-
+    Projet 2020/2021
+    API de pilotage d'actifs réseaux Cisco
+  version: "0.1"
+  contact:
+    email: "habib.bouzguenda@etudiant.univ-reims.fr"
+  license:
+    name: "URCA/IUT/RT"
+    url: "http://www.iut-rcc.fr"
+
+servers:
+  - url: http://localhost:5000/
+  - url: http://10.59.68.26:10020/
+  - url: http://10.59.68.26:10064/
+  - url: http://10.59.68.26:10068/
+  - url: http://10.59.68.26:10072/
+
+tags:
+- name: "Vlan"
+  description: "Gestion des VLANs"
+- name: "Interface"
+  description: "Gestion des interfaces"  
+- name: "Neighbor"
+  description: "Gestion du voisinage (CDP)"   
+
+paths:
+  /api/vlans:
+    get:
+      tags:
+        - 'Vlan'
+      summary: "Liste des VLANs"
+      description: 'Retourne la liste des VLANs sous forme d''une liste de couple ID/LABEL'
+      responses:
+        '200':    
+          description: "succes"
+          content:
+            application/json:
+              schema: 
+                type : array
+                items:
+                  $ref:  "#/components/schemas/Vlan"
+  /api/vlans/{vlan_id}:
+    get:
+      tags:
+        - 'Vlan'
+      summary: "Retourne l'identifiant d'un VLAN"
+      description: "Retourne l'identifiant et le nom du vlan à partir de son id numérique"
+      parameters:      
+        - name: vlan_id
+          in: path
+          required: true
+          description: identifiant de vlan
+          schema:
+            type : integer           
+      responses:
+        '200':    
+          description: "succes"
+          content:
+            application/json:
+              schema: 
+                  $ref:  "#/components/schemas/Vlan"
+        '404':
+          description: "VLAN not found"          
+  /api/interfaces:
+    get:
+      tags:
+        - 'Interface'
+      summary: "Liste les interfaces"
+      description: "Retourne la liste des interfaces de l'actif"
+      responses:
+        '200':    
+          description: "succes"
+          content:
+            application/json:
+              schema: 
+                type : array
+                items:
+                  $ref:  "#/components/schemas/Interface"
+  /api/interfaces/{if_id}:
+    get:
+      tags:
+        - 'Interface'
+      summary: "Retourne les informations d'une interfaces"
+      description: "Retourne l'identifiant et le nom du vlan à partir de son id numérique"
+      parameters:
+        - name: if_id
+          in: path
+          required: true
+          description: identifiant de l'interface
+          schema:
+            type : integer           
+      responses:
+        '200':    
+          description: "succes"
+          content:
+            application/json:
+              schema: 
+                  $ref:  "#/components/schemas/Interface"
+        '404':
+          description: "Interface not found"                  
+    post:
+      requestBody:
+      tags:
+        - 'Interface'
+      summary: "Modifier le vlan d'une interface"
+      description: "Changer le vlan "
+      parameters: 
+        - name: if_id
+          in: path
+          required: true
+          description: identifiant de l'interface
+          schema:
+            type : integer                             
+        - name: vlan_id
+          in: formData
+          required: true
+          description: identifiant du vlan
+          schema:
+            type : integer           
+      responses:
+        '200':    
+          description: "succes"
+        '404':
+          description: "Vlan not found"  
+  /api/neighbors:
+    get:
+      tags:
+        - 'Neighbor'
+      summary: "Gestion du voisinage (CDP)"  
+      responses:
+        '200':    
+          description: "succes"      
+          content:
+            application/json:
+              schema: 
+                type : array
+                items:
+                  $ref:  "#/components/schemas/CDPNeighbors"
+                  
+components:
+  schemas:
+    Vlan:
+      type: object
+      description: "Vlan"
+      properties:
+        id:
+          description: "identifiant de vlan"
+          type: integer
+          format: int32
+        name:
+          description: "nom du vlan"
+          type: string
+      example:
+        id: 10
+        name: 'ToIP'
+    Interface:
+      type: object
+      description: "Interface"
+      properties:
+        port:
+          description: "Identifiant d'interface"
+          type: string
+        name:
+          description: "label de l'interface"
+          type: string
+        mode:
+          description: "mode de fonctionnement de l'interface"
+          type: string
+          enum:
+            - "Trunk"
+            - "Acces"
+        status:
+          description: "statut de l'interface"
+          type: string
+          enum:
+            - "connected"
+            - "notconnected"
+            - "disabled"
+            - "errdisabled"
+        vlan_id:
+          description: "identifiant de vlan, 0 pour trunk"
+          type: integer
+          format: int32
+          minimum: 0
+          maximum: 1000
+        vlan_name:
+          description: "Nom de vlan"
+          type: string       
+        duplex:
+          description: "Etat de duplex"
+          type: string
+          enum:
+            - "a-full"
+            - "auto"
+        speed:
+          description: "débit de l'interface"
+          type: string
+          enum:
+            - "10Mbps"
+            - "100Mbps"
+            - "1Gbps"
+            - "10Gbps"
+            - "25Gbps"
+            - "40Gbps"
+            - "100Gps"
+        id :
+          description: "Identifiant de l'interface"
+          type: integer
+      example:
+        port: "FastEthernet0/0"
+        name: "PC LABO 2"
+        status: "connected"
+        mode: "trunk"
+        vlan: 10
+        vlan_name: default
+        duplex: "a-full"
+        speed: "100Mbps"
+        id : 10001
+    CDPNeighbors:
+      type: object
+      properties:
+        deviceId:
+          type: string
+        Plateform:
+          type: string
+        Version:
+          type: string
+        NativeVlan:
+            type: integer
+        IPAddress:
+          type: string
+        Port ID:
+          type: string
+      example:
+        deviceId: SWRT-FIBRE.chalons.univ-reims.fr
+        Plateform: cisco WS-C3750G-12S
+        Version: 12.2(55)SE10
+        NativeVlan: 90
+        IPAddress: 10.59.10.92
+        Port ID: FastEthernet1/0/47
