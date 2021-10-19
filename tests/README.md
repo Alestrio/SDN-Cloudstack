@@ -24,7 +24,7 @@ La formule pour récupérer l'ID final est : `=DROITE(A2;NBCAR(A2) - CHERCHE("."
 
 A l'heure actuelle, les résultats présents sont :
 | Nom du fichier brut | Nom du fichier mis en forme | Description |
---------------------------------
+|---------------------|-----|------|
 | walk_rtstack.txt | walk_rtstack.xlsx | Walk général effectué sur le switch RTSTACK |
 | walk_rtstack2.txt | walk_rtstack2.xlsx | Second walk général effectué sur le switch RTSTACK. Contient plus d'informations |
 | vlanmembership_rtstack.txt | vlanmembership_rtstack.xlsx | Subtree de la MIB CISCO-VLAN-MEMBERSHIP-MIB à partir de "ciscoVlanMembershipMIBObjects" |
