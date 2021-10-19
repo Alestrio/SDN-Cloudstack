@@ -29,3 +29,11 @@ A l'heure actuelle, les résultats présents sont :
 | walk_rtstack2.txt | walk_rtstack2.xlsx | Second walk général effectué sur le switch RTSTACK. Contient plus d'informations |
 | vlanmembership_rtstack.txt | vlanmembership_rtstack.xlsx | Subtree de la MIB CISCO-VLAN-MEMBERSHIP-MIB à partir de "ciscoVlanMembershipMIBObjects" |
 | vtpvlantable_rtstack.txt | vtpvlantable_rtstack.xlsx | Subtree de la MIB CISCO-VTP-MIB à partir de "vlanInfo" |
+| iface-vlan_rtstack.txt | iface-vlan_rtstack.txt | Correspondance interface-vlan de la RTSTACK, plus d'infos ci-dessous... |
+
+## Interface-vlan
+
+Chemin MIB : `1 (iso). 3 (org). 6 (dod). 1 (internet). 4 (private). 1 (enterprises). 9 (cisco). 9 (ciscoMgmt). 68 (ciscoVlanMembershipMIB). 1 (ciscoVlanMembershipMIBObjects). 2 (vmMembership). 2 (vmMembershipTable). 1 (vmMembershipEntry). 2 (vmVlan)`
+OID : `1.3.6.1.4.1.9.9.68.1.2.2.1.2`
+
+Ceci renvoie la correspondance VLAN-INTERFACE sur le Switch.
