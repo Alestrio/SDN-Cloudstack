@@ -1,0 +1,26 @@
+{
+    "duplex" : { 
+        "" : "",
+        "n/a" : "None",
+        "1" : "unknown",
+        "2" : "half-duplex",
+        "3" : "full-duplex"
+    },
+    "status" : {   
+        "" : "",
+        "1" : "Up",
+        "2" : "Down",
+        "3" : "Testing",
+        "4" : "unknown",
+        "5" : "dormant",
+        "6" : "notPresent",
+        "7" : "lowerLayerDown"
+    },
+    "mode" : {   
+        "" : "",
+        "n/a" : "n/a",
+        "1" : "Trunk",
+        "2" : "Acces"
+    }
+
+}

@@ -1,7 +1,7 @@
 import sys
 from models import *
 from fastapi import FastAPI, HTTPException
-from modules import *
+from snmp.modules import *
 
 api = FastAPI()
 

@@ -1,0 +1,26 @@
+
+devices:
+    - 
+        - type: switch
+        - label: "rt-reseau-1"
+        - dockerport: 10064
+        - ip: "10.59.10.64"
+    -
+        - type: switch
+        - label: "rt-reseau-2"
+        - dockerport: 10068
+        - ip: "10.59.10.68"
+    -
+        - type: switch
+        - label: "rt-reseau-3"
+        - dockerport: 10072
+        - ip: "10.59.10.72"
+
+    -
+        - type: switch
+        - label: "rt-reseau-test"
+        - dockerport: 10020
+        - ip: "10.59.10.20"        
+
+
+    

@@ -7,6 +7,7 @@ Ce dossier contient les tests effectués durant les recherches préparatoires po
 - CISCO-VLAN-IFTABLE-RELATIONSHIP-MIB.my
 - CISCO-VLAN-MEMBERSHIP-MIB.my
 - CISCO-VTP-MIB.my
+- RFC1213
 
 Toutes ces MIBs sont récuperables sur le FTP du constructeur conformément à cette fiche : https://www.cisco.com/c/en/us/td/docs/switches/lan/catalyst3750/software/release/12-2_44_se/configuration/guide/scg/swmibs.pdf
 
