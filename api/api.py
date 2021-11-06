@@ -10,20 +10,20 @@ ip_switch = str(sys.argv[1])
 
 @api.get("/api/vlans")
 def get_vlans():
-    response = vlans(ip_switch)
+    response = get_all_vlans(ip_switch)
     return response
 
 
 @api.get("/api/interfaces")
 def get_interfaces():
-    response = interfaces(ip_switch)
+    response = get_all_interfaces(ip_switch)
     return response
 
 
 @api.get("/api/vlans/{vl_id}")
 def get_vlan_id(vl_id: int):
-    if test(ip_switch, vl_id, '1.3.6.1.4.1.9.9.46.1.3.1.1.4'):
-        response = vlansbyid(ip_switch, vl_id)
+    if check_if_id_exists(ip_switch, vl_id, '1.3.6.1.4.1.9.9.46.1.3.1.1.4'):
+        response = get_vlan_by_id(ip_switch, vl_id)
     else:
         raise HTTPException(status_code=404, detail="Vlan not found")
     return response
@@ -31,8 +31,8 @@ def get_vlan_id(vl_id: int):
 
 @api.get("/api/interfaces/{if_id}")
 def get_if_id(if_id: int):
-    if test(ip_switch, if_id, '1.3.6.1.2.1.2.2.1.2'):
-        response = interfacebyid(ip_switch, if_id)
+    if check_if_id_exists(ip_switch, if_id, '1.3.6.1.2.1.2.2.1.2'):
+        response = get_interface_by_id(ip_switch, if_id)
     else:
         raise HTTPException(status_code=404, detail="Interface not found")
     return response
@@ -41,7 +41,7 @@ def get_if_id(if_id: int):
 @api.post("/api/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
     if body:
-        if new_vlan_if(ip_switch, if_id, body.vlan_id):
+        if set_interface_vlan(ip_switch, if_id, body.vlan_id):
             return {"message": "Vlan successfully changed"}
         else:
             raise HTTPException(status_code=404, detail="Interface or Vlan not found")
@@ -49,7 +49,7 @@ def set_vlan_on_interface(if_id: int, body: VlanId):
 
 @api.get("/api/neighbors")
 def get_cdpneighbors():
-    response = cdp_neighbors(ip_switch)
+    response = get_cdp_neighbors(ip_switch)
     return response
 
 

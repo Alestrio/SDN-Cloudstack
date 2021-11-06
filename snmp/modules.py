@@ -1,113 +1,195 @@
 import pysnmp
 from pysnmp import hlapi
 from snmp.snmp_bulk import get_snmp_bulk
-from snmp.snmp_byid import get_snmp_byid
+from snmp.snmp_byid import get_snmp_by_id
 from snmp.snmp_set import snmp_set
 import json
-etat = json.load(open('../config/etat.json', ))
+
+states = json.load(open('../config/states.json', ))
 
 
-# Faire un test pour savoir si l'id existe :
-def test(ip_switch,idt,oid):
-    list_id = get_snmp_bulk(ip_switch,oid)
+def check_if_id_exists(ip_switch, idt, oid):
+    """
+    Testing if the ID exists
+
+    :param ip_switch: IP address of the switch
+    :param idt: An ID of which I don't know the use case...
+    :param oid: Same as above
+    :return: Some kind of list apparently..
+    """
+
+    list_id = get_snmp_bulk(ip_switch, oid)
     for x in list_id:
-        if int(x[1]) == int(idt) :
-            return True       
-    return False   
+        if int(x[1]) == int(idt):  # TODO find out what this is for...
+            return True
+    return False
 
-# Trouver l'information spécifique à l'id :
-def find(ip_switch,idt,oid):
-    if idt == 'n/a': 
-        data = 'n/a'
-        return (data)
-    else : 
-        data = get_snmp_byid(ip_switch,int(idt),oid+str(int(idt)-1))
+
+# Find specific information using id
+def find(ip_switch, idt, oid):
+    """
+    TODO Documentation here /!\
+
+    :param ip_switch: IP address of the switch
+    :param idt: An ID of which I don't know the use case...
+    :param oid: Same as above
+    :return: Some kind of list apparently..
+    """
+
+    if idt == 'n/a':
+        return idt
+    else:
+        data = get_snmp_by_id(ip_switch, int(idt), oid + str(int(idt) - 1))
         return data[0]
 
 
-# Mettre la liste des vlans en format JSON :
-def vlans(ip_switch):
-    list_vlans = get_snmp_bulk(ip_switch,('1.3.6.1.4.1.9.9.46.1.3.1.1.4'))
-    resultats = []
-    for vlans in list_vlans :
+def get_all_vlans(ip_switch):
+    """
+    Gathers VLAN list
+
+    :param ip_switch: IP address of the switch
+    :return: list containing VLANS
+    """
+
+    list_vlans = get_snmp_bulk(ip_switch, ('1.3.6.1.4.1.9.9.46.1.3.1.1.4'))
+    results = []
+    for vlans in list_vlans:
         vlan = {
-                "name" : vlans[0],
-                "id" : int(vlans[1]) 
-               }
-        resultats.append(vlan)      
-    return resultats
+            "name": vlans[0],
+            "id": int(vlans[1])
+        }
+        results.append(vlan)
+    return results
 
 
+def get_all_interfaces(ip_switch):
+    """
+    Gathers interfaces list
 
-# Mettre la liste des interfaces en format JSON :
-def interfaces(ip_switch):
-    list_interfaces = get_snmp_bulk(ip_switch,'1.3.6.1.2.1.2.2.1.2','1.3.6.1.2.1.31.1.1.1.1','1.3.6.1.2.1.2.2.1.8','1.3.6.1.2.1.2.2.1.5','1.3.6.1.4.1.9.9.68.1.2.2.1.2','1.3.6.1.2.1.10.7.2.1.19','1.3.6.1.4.1.9.9.46.1.6.1.1.14')
-    resultats = []
-    for interface in list_interfaces :
+    :param ip_switch:  IP address of the switch
+    :return: list containing interface descriptions
+    """
+
+    list_interfaces = get_snmp_bulk(ip_switch, '1.3.6.1.2.1.2.2.1.2',
+                                    '1.3.6.1.2.1.31.1.1.1.1',
+                                    '1.3.6.1.2.1.2.2.1.8',
+                                    '1.3.6.1.2.1.2.2.1.5',
+                                    '1.3.6.1.4.1.9.9.68.1.2.2.1.2',
+                                    '1.3.6.1.2.1.10.7.2.1.19',
+                                    '1.3.6.1.4.1.9.9.46.1.6.1.1.14')
+    # TODO Should consider putting this is config file
+    results = []
+    for interface in list_interfaces:
         interface = {
-                "port" : interface[3],
-                "name" : interface[4],
-                "mode" : etat["mode"][interface[2]],
-                "status" : etat["status"][interface[5]], 
-                "speed" : (str(int(int(interface[6])/1000000))) + " Mbps", 
-                "vlan" : interface[0],
-                "duplex" : etat["duplex"][interface[1]],
-                "id" : int(interface[7])
-               }
-        resultats.append(interface)       
-    return resultats
+            "port": interface[3],
+            "name": interface[4],
+            "mode": states["mode"][interface[2]],
+            "status": states["status"][interface[5]],
+            "speed": (str(int(int(interface[6]) / 1000000))) + " Mbps",
+            "vlan": interface[0],
+            "duplex": states["duplex"][interface[1]],
+            "id": int(interface[7])
+        }
+        results.append(interface)
+    return results
 
 
-# Mettre un vlan en format JSON :
-def vlansbyid(ip_switch,vl_id):
-    vlan = get_snmp_byid(ip_switch,vl_id,'1.3.6.1.4.1.9.9.46.1.3.1.1.4.1.'+str(vl_id - 1))
+def get_vlan_by_id(ip_switch, vl_id):
+    """
+    Gathers information about a specific VLAN
+
+    :param ip_switch: IP address of the switch
+    :param vl_id: ID of the vlan
+    :return: A JSON object containing a VLAN's information
+    """
+
+    vlan = get_snmp_by_id(ip_switch, vl_id, '1.3.6.1.4.1.9.9.46.1.3.1.1.4.1.' + str(vl_id - 1))
     print(vlan)
-    resultats = {
-                "name" : vlan[0],
-                "id" : vl_id
-               }      
-    return resultats    
+    results = {
+        "name": vlan[0],
+        "id": vl_id
+    }
+    return results
 
-# Mettre une interface en format JSON :
-def interfacebyid (ip_switch,if_id) :
 
-    interface = get_snmp_byid(ip_switch,if_id,'1.3.6.1.2.1.2.2.1.2.'+str(if_id - 1),'1.3.6.1.2.1.31.1.1.1.1.'+str(if_id - 1),'1.3.6.1.2.1.2.2.1.8.'+str(if_id - 1),'1.3.6.1.2.1.2.2.1.5.'+str(if_id - 1),'1.3.6.1.4.1.9.9.68.1.2.2.1.2.'+str(if_id - 1),'1.3.6.1.2.1.10.7.2.1.19.'+str(if_id - 1),'1.3.6.1.4.1.9.9.46.1.6.1.1.14.'+str(if_id - 1))
-    resultats = {
-                "port" : interface[0],
-                "name" : interface[1],
-                "status" : etat["status"][interface[2]], 
-                "speed" : (str(int(int(interface[3])/1000000))) + " Mbps", 
-                "vlan_id" : interface[4],
-                "vlan_name" : find(ip_switch,interface[4],'1.3.6.1.4.1.9.9.46.1.3.1.1.4.1.'),
-                "mode" : etat["mode"][interface[6]],
-                "duplex" : etat["duplex"][interface[5]],
-                "id" : if_id
-               }
-    return resultats           
+def get_interface_by_id(ip_switch, if_id):
+    """
+    Gathers information about a specific interface
 
-# Changer le vlan d'une interface :
-def new_vlan_if(ip_switch,if_id,vlan_id) : 
-    if test(ip_switch,int(if_id),'1.3.6.1.2.1.2.2.1.2') and test(ip_switch,int(vlan_id),'1.3.6.1.4.1.9.9.46.1.3.1.1.4') :
-        snmp_set(ip_switch, {'1.3.6.1.4.1.9.9.68.1.2.2.1.2.'+str(if_id):pysnmp.proto.rfc1902.Integer(int(vlan_id)) }, hlapi.CommunityData('cloudstack'))
+    :param ip_switch: IP address of the switch
+    :param if_id: ID of the interface
+    :return: A JSON object containing an interface's information
+    """
+    clean_if_id = str(if_id - 1)
+
+    interface = get_snmp_by_id(ip_switch, if_id, '1.3.6.1.2.1.2.2.1.2.' + clean_if_id,
+                              '1.3.6.1.2.1.31.1.1.1.1.' + clean_if_id,
+                              '1.3.6.1.2.1.2.2.1.8.' + clean_if_id,
+                              '1.3.6.1.2.1.2.2.1.5.' + clean_if_id,
+                              '1.3.6.1.4.1.9.9.68.1.2.2.1.2.' + clean_if_id,
+                              '1.3.6.1.2.1.10.7.2.1.19.' + clean_if_id,
+                              '1.3.6.1.4.1.9.9.46.1.6.1.1.14.' + clean_if_id)  # Does this OID 
+    # list even work ? TODO Should consider putting this is config file
+    results = {
+        "port": interface[0],
+        "name": interface[1],
+        "status": states["status"][interface[2]],  # That's honestly pretty clever
+        "speed": (str(int(int(interface[3]) / 1000000))) + " Mbps",
+        "vlan_id": interface[4],
+        "vlan_name": find(ip_switch, interface[4], '1.3.6.1.4.1.9.9.46.1.3.1.1.4.1.'),
+        "mode": states["mode"][interface[6]],
+        "duplex": states["duplex"][interface[5]],
+        "id": if_id
+    }
+    return results
+
+
+def set_interface_vlan(ip_switch, if_id, vlan_id):
+    """
+    Changes an interface's VLAN
+
+    :param ip_switch: IP address of the switch
+    :param if_id: ID of the interface
+    :param vlan_id: VLAN ID
+    :return: A boolean status code
+    """
+    if check_if_id_exists(ip_switch, int(if_id), '1.3.6.1.2.1.2.2.1.2') and \
+            check_if_id_exists(ip_switch, int(vlan_id), '1.3.6.1.4.1.9.9.46.1.3.1.1.4'):  # Soo, that's where test is used !
+        snmp_set(ip_switch, {'1.3.6.1.4.1.9.9.68.1.2.2.1.2.' + str(if_id): pysnmp.proto.rfc1902.Integer(int(vlan_id))},
+                 # TODO check if that double conversion is really needed
+                 hlapi.CommunityData('cloudstack'))
         return True
     return False
 
-# Mettre la liste des CDP neighbors en format JSON  :
-def cdp_neighbors(ip_switch) :
-    list_cdp = get_snmp_bulk(ip_switch,'1.3.6.1.4.1.9.9.23.1.2.1.1.6','1.3.6.1.4.1.9.9.23.1.2.1.1.8','1.3.6.1.4.1.9.9.23.1.2.1.1.5','1.3.6.1.4.1.9.9.23.1.2.1.1.11','1.3.6.1.4.1.9.9.23.1.2.1.1.4','1.3.6.1.4.1.9.9.23.1.2.1.1.7')
-    resultats = []
-    for cdps in list_cdp:
-        addr =''
-        for i in range(0,len(cdps[4])):
-            addr = addr +str(cdps[4].encode("utf-8")[i]) + "."
-            i = i+1
-        cdp = {
-            "deviceId" : cdps[0], 
-            "Plateform" : cdps[1],
-            "Version" : str(str(cdps[2])[str(cdps[2]).find("Version"):len(str(cdps[2]))])[0:str(str(cdps[2])[str(cdps[2]).find("Version"):len(str(cdps[2]))]).find(",")],
-            "NativeVlan" : cdps[3],
-            "IPAddress" : addr[:-1],
-            "Port ID" : cdps[5]
+
+def get_cdp_neighbors(ip_switch):
+    """
+    Gathers a list of CDP neighbors
+
+    :param ip_switch: IP address of the switch
+    :return: A list of CDP neighbors
+    """
+    neighbors = get_snmp_bulk(ip_switch, '1.3.6.1.4.1.9.9.23.1.2.1.1.6',
+                              '1.3.6.1.4.1.9.9.23.1.2.1.1.8',
+                              '1.3.6.1.4.1.9.9.23.1.2.1.1.5',
+                              '1.3.6.1.4.1.9.9.23.1.2.1.1.11',
+                              '1.3.6.1.4.1.9.9.23.1.2.1.1.4',
+                              '1.3.6.1.4.1.9.9.23.1.2.1.1.7')  # TODO should consider exporting this to a config file
+    results = []
+    for neighbor in neighbors:
+        addr = ''
+        for i in range(0, len(neighbor[4])):
+            addr = addr + str(neighbor[4].encode("utf-8")[i]) + "."
+            i = i + 1
+        cdp_neighbor = {
+            "deviceId": neighbor[0],
+            "Plateform": neighbor[1],
+            "Version": str(str(neighbor[2])[str(neighbor[2]).find("Version"): len(str(neighbor[2]))])[
+                       0: str(str(neighbor[2])[str(neighbor[2]).find("Version"): len(str(neighbor[2]))]).find(",")],
+            # Excuse me wtf ? TODO Simplify this..
+            "NativeVlan": neighbor[3],
+            "IPAddress": addr[:-1],
+            "Port ID": neighbor[5]
         }
-        resultats.append(cdp)      
-    return resultats        
+        results.append(cdp_neighbor)
+    return results

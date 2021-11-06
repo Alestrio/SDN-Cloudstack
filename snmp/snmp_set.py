@@ -1,19 +1,12 @@
 import pysnmp
 from pysnmp import hlapi
-def cast(value):
-    try:
-        return int(value)
-    except (ValueError, TypeError):
-        try:
-            return float(value)
-        except (ValueError, TypeError):
-            try:
-                return str(value)
-            except (ValueError, TypeError):
-                pass
-    return value
+
+
+# https://pastebin.com/GBWUJa4U
+
 
 def fetch(handler, count):
+    # TODO documentation, seems to be code gathered on internet
     result = []
     for i in range(count):
         try:
@@ -29,13 +22,52 @@ def fetch(handler, count):
             break
     return result
 
+
+def cast(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            try:
+                return str(value)
+            except (ValueError, TypeError):
+                pass
+    return value
+
+
+""" This function can be reused for other PySNMP functions, like GetBulk. It simply loops
+on the handler for as many times as we tell it (count variable). If it encounters any
+error it stops and raises a RuntimeError, if no error is encountered it stores the data
+in a list of dictionaries.
+
+try ... except StopIteration construct is in case the user specifies a higher number
+of objects than it actually has, the code stops and returns what it has so far.
+
+In each get() operation we get multiple OIDs, thus each dictionary will have as a key
+the OID and as value the value of that OID in the MIB. In case it requires multiple OIDs
+in a single Get it returns a dictinonary with multiple keys.
+
+Using list in case the user needs the same information many times on different instance.
+Such as errors on different interfaces where instance = interface. 
+
+fetch() relies on function called cast() which just converts the data as received from
+PySNMP to integer, float, or string. """
+
+
 def construct_value_pairs(list_of_pairs):
     pairs = []
     for key, value in list_of_pairs.items():
         pairs.append(pysnmp.hlapi.ObjectType(pysnmp.hlapi.ObjectIdentity(key), value))
     return pairs
 
-def snmp_set(target, value_pairs, credentials, port=161, engine=pysnmp.hlapi.SnmpEngine(), context=pysnmp.hlapi.ContextData()):
+""" This function returns a list, that we can expand by prepending a "*" as we did above
+in the get() function """
+
+
+def snmp_set(target, value_pairs, credentials, port=161, engine=pysnmp.hlapi.SnmpEngine(),
+             context=pysnmp.hlapi.ContextData()):
     handler = pysnmp.hlapi.setCmd(
         engine,
         credentials,
@@ -44,3 +76,6 @@ def snmp_set(target, value_pairs, credentials, port=161, engine=pysnmp.hlapi.Snm
         *construct_value_pairs(value_pairs)
     )
     return fetch(handler, 1)[0]
+
+# TODO : cleanup this ENTIRE file
+# It's trying to kill an ant with a BOEING 777
