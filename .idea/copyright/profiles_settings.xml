@@ -1,0 +1,8 @@
+<component name="CopyrightManager">
+  <settings>
+    <module2copyright>
+      <element module="All" copyright="SDN-API" />
+      <element module="lib" copyright="None" />
+    </module2copyright>
+  </settings>
+</component>
