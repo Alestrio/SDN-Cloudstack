@@ -10,6 +10,7 @@
 #
 
 from pydantic import BaseModel
+from pydantic.typing import Optional, Union
 
 
 class VlanId(BaseModel):
@@ -17,3 +18,30 @@ class VlanId(BaseModel):
     That class defines the request body for a VLAN switching on an interface
     """
     vlan_id: int
+
+
+class Vlan(BaseModel):
+    """
+    That class defines a VLAN as it is described in JSONs sent and received by the API
+    """
+    description: str
+    dot1q_id: int
+
+
+class Interface(BaseModel):
+    """
+    That class defines an interface as it is described in JSONs sent and received by the API
+    """
+    description: str
+    id: int
+    status: Optional[str]
+    operational_mode: Union[str, int]  # Can be provided as int for config creation
+    vlan: Optional[Vlan]
+
+
+class Config(BaseModel):
+    """
+    That class defines the JSON model for add_config POST request
+    """
+    interfaces: list[Interface]
+
