@@ -4,10 +4,7 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-#
-#
-#
-#
+
 
 from pydantic import BaseModel
 from pydantic.typing import Optional, Union
@@ -36,7 +33,7 @@ class Interface(BaseModel):
     id: int
     status: Optional[str]
     operational_mode: Union[str, int]  # Can be provided as int for config creation
-    vlan: Optional[Vlan]
+    vlan: Optional[Union[Vlan, int]]
 
 
 class Config(BaseModel):
