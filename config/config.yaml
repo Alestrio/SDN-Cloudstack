@@ -1,0 +1,9 @@
+database:
+  host: 10.59.114.10
+  port: 8081
+  username: foo
+  password: bar
+  database_name: thing
+api:
+  route_prefix: /api/v1.5
+oids:
