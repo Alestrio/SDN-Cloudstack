@@ -13,16 +13,11 @@ class Database:
     """
     Interface between the API and the MONGODB database
     """
-    def __init__(self):
-        try:
-            with open('../../config/config.yaml') as file:
-                config = yaml.load(file, Loader=yaml.Loader)['database']  # Opens database config
-                connection_string = f"mongodb+srv://{config['username']}:{config['password']}@{config['host']}"
-                self.client = pymongo.MongoClient(connection_string)
-                self.database = self.client[config['database_name']]
-                self.configs_collections = self.database['configs']
-        except:
-            print('No config file (ERRNO 101)')
+    def __init__(self, config):
+        connection_string = f"mongodb://{config['username']}:{config['password']}@{config['host']}"
+        self.client = pymongo.MongoClient(connection_string)
+        self.database = self.client[config['database_name']]
+        self.configs_collections = self.database['configs']
 
     def get_configs(self):
         """
