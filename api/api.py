@@ -43,7 +43,7 @@ def get_interfaces():
     return response
 
 
-@api.get(f"{ROUTE_PREFIX}/vlans/{vl_id}")
+@api.get(ROUTE_PREFIX+"/vlans/{vl_id}")
 def get_vlan_id(vl_id: int):
     if modules.check_if_id_exists(ip_switch, vl_id, '1.3.6.1.4.1.9.9.46.1.3.1.1.4'):
         response = modules.get_vlan_by_id(ip_switch, vl_id)
@@ -52,7 +52,7 @@ def get_vlan_id(vl_id: int):
     return response
 
 
-@api.get(f"{ROUTE_PREFIX}/interfaces/{if_id}")
+@api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):
     if modules.check_if_id_exists(ip_switch, if_id, '1.3.6.1.2.1.2.2.1.2'):
         response = modules.get_interface_by_id(ip_switch, if_id)
@@ -61,7 +61,7 @@ def get_if_id(if_id: int):
     return response
 
 
-@api.post(f"{ROUTE_PREFIX}/interfaces/{if_id}")
+@api.post(ROUTE_PREFIX+"/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
     if body:
         if modules.set_interface_vlan(ip_switch, if_id, body.vlan_id):
