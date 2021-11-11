@@ -38,7 +38,7 @@ def get_vlans():
 
 @api.get(f"{ROUTE_PREFIX}/interfaces")
 def get_interfaces():
-    response = modules.get_all_interfaces(IP_SWITCH)
+    response = gateway.get_all_interfaces()
     return response
 
 
