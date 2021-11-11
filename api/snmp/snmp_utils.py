@@ -21,7 +21,12 @@ class SnmpUtils:
         self.community = community
 
     def findById(self, oid, id):
-        return list(self.walk(oid + "." + str(id), 1).values())[-1]
+        item = self.walk(oid + "." + str(id-1), 1)  # I dunno why, but you need -1 here..
+        if str(id) == list(item.keys())[-1].split('.')[-1]:
+            return list(item.values())[-1]
+        else:
+            return None
+
 
     def defineOIDsList(self):
         with open('./OIDS.json', ) as file:
