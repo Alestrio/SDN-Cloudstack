@@ -8,8 +8,10 @@
 
 import sys
 
+import uvicorn as uvicorn
 import yaml
 
+from api.snmp.snmpGateway import SnmpGateway
 from models import *
 from snmp import modules
 from db import database
@@ -20,16 +22,17 @@ try:
     file = open('../config/config.yaml')
     config = yaml.load(file, Loader=yaml.Loader)
     ROUTE_PREFIX = config['api']['route_prefix']
-    IP_SWITCH = config['api']['ip_switch']
     db = database.Database(config['database'])
     OIDS = config['oids']
+    gateway = SnmpGateway(config['snmp'], config['oids'])
 except FileNotFoundError:
     print('No config file (ERRNO 101)')
+    ROUTE_PREFIX = '/api'
 
 
 @api.get(f"{ROUTE_PREFIX}/vlans")
 def get_vlans():
-    response = modules.get_all_vlans(IP_SWITCH)
+    response = gateway.get_all_vlans()
     return response
 
 
@@ -41,8 +44,8 @@ def get_interfaces():
 
 @api.get(ROUTE_PREFIX+"/vlans/{vl_id}")
 def get_vlan_id(vl_id: int):
-    if modules.check_if_id_exists(IP_SWITCH, vl_id, OIDS['vlans']['name']):
-        response = modules.get_vlan_by_id(IP_SWITCH, vl_id)
+    if gateway.check_if_id_exists(OIDS['vlans']['name'] + f".{vl_id}"):
+        response = gateway.get_vlan_by_id(vl_id)
     else:
         raise HTTPException(status_code=404, detail="Vlan not found")
     return response
@@ -50,8 +53,8 @@ def get_vlan_id(vl_id: int):
 
 @api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):
-    if modules.check_if_id_exists(IP_SWITCH, if_id, OIDS['interfaces']['description']):
-        response = modules.get_interface_by_id(IP_SWITCH, if_id)
+    if gateway.check_if_id_exists(OIDS['interfaces']['description'] + f".{if_id}"):
+        response = gateway.get_interface_by_id(if_id)
     else:
         raise HTTPException(status_code=404, detail="Interface not found")
     return response
@@ -60,7 +63,7 @@ def get_if_id(if_id: int):
 @api.post(ROUTE_PREFIX+"/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
     if body:
-        if modules.set_interface_vlan(IP_SWITCH, if_id, body.vlan_id):
+        if gateway.set_interface_vlan(if_id, body.vlan_id):
             return {"message": "Vlan successfully changed"}
         else:
             raise HTTPException(status_code=404, detail="Interface or Vlan not found")
@@ -68,7 +71,7 @@ def set_vlan_on_interface(if_id: int, body: VlanId):
 
 @api.get(f"{ROUTE_PREFIX}/neighbors")
 def get_cdp_neighbors():
-    response = modules.get_cdp_neighbors(IP_SWITCH)
+    response = gateway.get_cdp_neighbors()
     return response
 
 
@@ -81,4 +84,5 @@ def add_config(configuration: Config):
 
 
 if __name__ == "__main__":
-    api.run(host='0.0.0.0', debug=True)
+    uvicorn.run(api, host='127.0.0.1', debug=True)
+
