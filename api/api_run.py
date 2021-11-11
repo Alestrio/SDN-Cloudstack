@@ -11,7 +11,7 @@ import sys
 import uvicorn as uvicorn
 import yaml
 
-from api.snmp.snmpGateway import SnmpGateway
+from snmp.snmpGateway import SnmpGateway
 from models import *
 from snmp import modules
 from db import database
@@ -44,12 +44,11 @@ def get_interfaces():
 
 @api.get(ROUTE_PREFIX+"/vlans/{vl_id}")
 def get_vlan_id(vl_id: int):
-    if gateway.check_if_id_exists(OIDS['vlans']['name'] + f".{vl_id}"):
-        response = gateway.get_vlan_by_id(vl_id)
+    response = gateway.get_vlan_by_id(vl_id)
+    if response:
+        return response
     else:
         raise HTTPException(status_code=404, detail="Vlan not found")
-    return response
-
 
 @api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):

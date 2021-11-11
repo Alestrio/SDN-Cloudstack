@@ -7,9 +7,9 @@
 
 import pysnmp
 from pysnmp import hlapi
-from api.snmp.snmp_bulk import get_snmp_bulk
-from api.snmp.snmp_byid import get_snmp_by_id
-from api.snmp.snmp_set import snmp_set
+from snmp.snmp_bulk import get_snmp_bulk
+from snmp.snmp_byid import get_snmp_by_id
+from snmp.snmp_set import snmp_set
 import json
 
 states = json.load(open('../config/states.json', ))

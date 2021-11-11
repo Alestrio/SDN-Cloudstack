@@ -30,10 +30,11 @@ class Interface(BaseModel):
     That class defines an interface as it is described in JSONs sent and received by the API
     """
     description: str
-    id: int
+    port_id: int
     status: Optional[str]
     operational_mode: Union[str, int]  # Can be provided as int for config creation
     vlan: Optional[Union[Vlan, int]]
+    speed: Optional[int]
 
 
 class Config(BaseModel):

@@ -19,7 +19,6 @@ class SnmpUtils:
         self.host = host
         self.port = port
         self.community = community
-        #self.defineOIDsList()
 
     def findById(self, oid, id):
         return self.walk(oid + "." + str(id), 1)
