@@ -21,7 +21,7 @@ class SnmpUtils:
         self.community = community
 
     def findById(self, oid, id):
-        return self.walk(oid + "." + str(id), 1)
+        return list(self.walk(oid + "." + str(id), 1).values())[-1]
 
     def defineOIDsList(self):
         with open('./OIDS.json', ) as file:
@@ -94,10 +94,3 @@ class SnmpUtils:
                     else:
                         return results
         return results
-
-
-if __name__ == "__main__":
-    snmp = SnmpUtils("10.59.10.20")
-    for k,v in snmp.walk(snmp.OIDS.OLT.ONU.MAC_ADDRESS, 8).items():
-        #print(k,v)
-        pass

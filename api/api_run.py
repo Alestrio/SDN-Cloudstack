@@ -52,11 +52,11 @@ def get_vlan_id(vl_id: int):
 
 @api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):
-    if gateway.check_if_id_exists(OIDS['interfaces']['description'] + f".{if_id}"):
-        response = gateway.get_interface_by_id(if_id)
+    response = gateway.get_interface_by_id(if_id)
+    if response:
+        return response
     else:
         raise HTTPException(status_code=404, detail="Interface not found")
-    return response
 
 
 @api.post(ROUTE_PREFIX+"/interfaces/{if_id}")

@@ -16,6 +16,7 @@ class SnmpGateway(SnmpUtils):
         super().__init__(config['host'], port=config['port'], community=config['community'])
         self.OIDS = oids
 
+
     def get_all_vlans(self):
         """
         Allows to query and get all vlans
@@ -66,15 +67,32 @@ class SnmpGateway(SnmpUtils):
                                     if_macs)
 
     def get_vlan_by_id(self, vlan_id):
-        vlan_name = list(self.findById((self.OIDS['vlans']['name']), vlan_id).values())[-1]
-        vlan_dot1q_id = int(list(self.findById((self.OIDS['vlans']['dot1q_id']), vlan_id).values())[-1], 16)-100001
+        vlan_name = self.findById((self.OIDS['vlans']['name']), vlan_id)
+        vlan_dot1q_id = int(self.findById(self.OIDS['vlans']['dot1q_id'], vlan_id), 16)-100001
         if vlan_dot1q_id == vlan_id:
             return Vlan(dot1q_id=vlan_dot1q_id, description=vlan_name)
         else:
             return None
 
     def get_interface_by_id(self, interface_id):
-        pass
+        interface_id-=1
+        if_description = self.findById(self.OIDS['interfaces']['description'], interface_id)
+        if_port_id = self.findById(self.OIDS['interfaces']['index'], interface_id)
+        if_status = self.findById(self.OIDS['interfaces']['status']+'.1', interface_id)
+        if_op_mode = self.findById(self.OIDS['interfaces']['op_mode']+'.1', interface_id)
+        if_vlan = self.get_vlan_by_id(int(self.findById(self.OIDS['interfaces']['vlan'], interface_id)))
+        if_speed = self.findById(self.OIDS['interfaces']['speed'] +'.1', interface_id)
+        # +'.1' required because if identifier = 1.if_id
+        if_mac = self.findById(self.OIDS['interfaces']['mac_address'], interface_id)
+        if str(interface_id+1) == if_port_id:
+            return Interface(description=if_description,
+                            port_id=int(if_port_id),
+                            status=if_status,
+                            operational_mode=if_op_mode,
+                            vlan=if_vlan,
+                            speed=int(if_speed)/1000000)
+        else:
+            return None
 
     def set_interface_vlan(self, interface_id, vlan_id):
         pass
