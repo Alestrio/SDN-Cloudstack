@@ -6,7 +6,10 @@ database:
   database_name: thing
 api:
   route_prefix: /api/v1.5
-  ip_switch: 10.59.0.0  # Not gonna show my secrets !
+snmp:
+  host: 10.59.10.64
+  port: 161
+  community: public
 
 oids:
   systemName: 1.3.6.1.2.1.1.5
@@ -23,3 +26,4 @@ oids:
       vlan: 1.3.6.1.4.1.9.9.68.1.2.2.1.2
   vlans:
     name: 1.3.6.1.4.1.9.9.46.1.3.1.1.4.1
+    dot1q_id: 1.3.6.1.4.1.9.9.46.1.3.1.1.6.1

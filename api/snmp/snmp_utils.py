@@ -8,7 +8,7 @@ from pysnmp.hlapi import nextCmd, CommunityData, UdpTransportTarget, ContextData
 from pysnmp.smi.rfc1902 import ObjectType, ObjectIdentity
 
 
-class SNMP_UTILS:
+class SnmpUtils:
     """
     SNMP Utils Class for walk/bulk/set more easily in python.
     @author: HakkaOfDev
@@ -19,7 +19,7 @@ class SNMP_UTILS:
         self.host = host
         self.port = port
         self.community = community
-        self.defineOIDsList()
+        #self.defineOIDsList()
 
     def findById(self, oid, id):
         return self.walk(oid + "." + str(id), 1)
@@ -98,7 +98,7 @@ class SNMP_UTILS:
 
 
 if __name__ == "__main__":
-    snmp = SNMP_UTILS("10.59.10.20")
+    snmp = SnmpUtils("10.59.10.20")
     for k,v in snmp.walk(snmp.OIDS.OLT.ONU.MAC_ADDRESS, 8).items():
         #print(k,v)
         pass

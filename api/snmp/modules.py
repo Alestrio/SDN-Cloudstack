@@ -4,10 +4,6 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-#
-#
-#
-#
 
 import pysnmp
 from pysnmp import hlapi
@@ -16,7 +12,7 @@ from api.snmp.snmp_byid import get_snmp_by_id
 from api.snmp.snmp_set import snmp_set
 import json
 
-states = json.load(open('../../config/states.json', ))
+states = json.load(open('../config/states.json', ))
 
 
 def check_if_id_exists(ip_switch, idt, oid):
@@ -62,7 +58,7 @@ def get_all_vlans(ip_switch):
     :return: list containing VLANS
     """
 
-    list_vlans = get_snmp_bulk(ip_switch, ('1.3.6.1.4.1.9.9.46.1.3.1.1.4'))
+    list_vlans = get_snmp_bulk(ip_switch, ('1.3.6.1.4.1.9.9.46.1.3.1.1.4'))  #VlanName
     results = []
     for vlans in list_vlans:
         vlan = {
