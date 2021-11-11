@@ -16,6 +16,12 @@ class SnmpGateway(SnmpUtils):
         super().__init__(config['host'], port=config['port'], community=config['community'])
         self.OIDS = oids
 
+    def bulk(self, *oids_list):
+        """
+        That function overrides the one in the library to provide only values
+        """
+        result = super(SnmpGateway, self).bulk(*oids_list)
+        return list(result.values())
 
     def get_all_vlans(self):
         """
@@ -29,8 +35,8 @@ class SnmpGateway(SnmpUtils):
                 vlans.append(Vlan(dot1q_id=vl_id, description=names[i]))
             return vlans
 
-        vlan_names = list(self.bulk(self.OIDS['vlans']['name']).values())
-        vlan_ids = list(self.bulk(self.OIDS['vlans']['dot1q_id']).values())
+        vlan_names = self.bulk(self.OIDS['vlans']['name'])
+        vlan_ids = self.bulk(self.OIDS['vlans']['dot1q_id'])
         return parse_vlan_list(vlan_ids, vlan_names)
 
     def get_all_interfaces(self):
@@ -56,13 +62,13 @@ class SnmpGateway(SnmpUtils):
                                             speed=int(speeds[i])/1000000))
             return ifaces
 
-        if_descriptions = list(self.bulk(self.OIDS['interfaces']['description']).values())
-        if_port_ids = list(self.bulk(self.OIDS['interfaces']['index']).values())
-        if_statuses = list(self.bulk(self.OIDS['interfaces']['status']).values())
-        if_op_modes = list(self.bulk(self.OIDS['interfaces']['op_mode']).values())
-        if_vlans = self.bulk(self.OIDS['interfaces']['vlan'])
-        if_speeds = list(self.bulk(self.OIDS['interfaces']['speed']).values())
-        if_macs = list(self.bulk(self.OIDS['interfaces']['mac_address']).values())
+        if_descriptions = self.bulk(self.OIDS['interfaces']['description'])
+        if_port_ids = self.bulk(self.OIDS['interfaces']['index'])
+        if_statuses = self.bulk(self.OIDS['interfaces']['status'])
+        if_op_modes = self.bulk(self.OIDS['interfaces']['op_mode'])
+        if_vlans = super(SnmpGateway, self).bulk(self.OIDS['interfaces']['vlan'])  # Using the library method
+        if_speeds = self.bulk(self.OIDS['interfaces']['speed'])
+        if_macs = self.bulk(self.OIDS['interfaces']['mac_address'])
         return parse_interface_list(if_descriptions, if_port_ids, if_statuses, if_op_modes, if_vlans, if_speeds,
                                     if_macs)
 
