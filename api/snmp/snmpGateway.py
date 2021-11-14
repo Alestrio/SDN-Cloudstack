@@ -6,8 +6,6 @@
 #  reproduction forbidden except with authorization from the authors.
 from models import Vlan, Interface
 from snmp.snmp_utils import SnmpUtils
-import time
-import json
 
 
 class SnmpGateway(SnmpUtils):
@@ -62,7 +60,6 @@ class SnmpGateway(SnmpUtils):
         ifaces = []
         times = []
         for i in range(len(if_descriptions) - 1):
-            t0 = time.process_time()
             try:
                 ifaces += [Interface(description=if_descriptions[i],
                                         port_id=int(if_port_ids[i]),
@@ -70,16 +67,13 @@ class SnmpGateway(SnmpUtils):
                                         operational_mode=if_op_modes[i],
                                         vlan=vlans_by_id[if_vlans[self.OIDS['interfaces']['vlan'] + f'.{if_port_ids[i]}']],
                                         speed=int(if_speeds[i]) / 1000000)]
-                print('VLAN !')
             except KeyError:
                 ifaces += [Interface(description=if_descriptions[i],
                                         port_id=int(if_port_ids[i]),
                                         status=if_statuses[i],
                                         operational_mode=if_op_modes[i],
                                         speed=int(if_speeds[i]) / 1000000)]
-            print(t0)
-            times.append(t0)
-        return ifaces, times
+        return ifaces
 
     def get_vlan_by_id(self, vlan_id):
         if vlan_id:
