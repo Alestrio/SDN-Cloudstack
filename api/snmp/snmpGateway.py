@@ -6,6 +6,8 @@
 #  reproduction forbidden except with authorization from the authors.
 from models import Vlan, Interface
 from snmp.snmp_utils import SnmpUtils
+import time
+import json
 
 
 class SnmpGateway(SnmpUtils):
@@ -44,23 +46,6 @@ class SnmpGateway(SnmpUtils):
         Allows to query and get all interfaces
         :return: A list of interfaces
         """
-        def parse_interface_list(descriptions, port_ids, statuses, op_modes, vlans, speeds, macs):
-            ifaces = list[Interface]()
-            for i in range(len(descriptions)-1):
-                try:
-                    ifaces.append(Interface(description=descriptions[i],
-                                            port_id=int(port_ids[i]),
-                                            status=statuses[i],
-                                            operational_mode=op_modes[i],
-                                            vlan=self.get_vlan_by_id(int(vlans[self.OIDS['interfaces']['vlan']+f'.{port_ids[i]}'])),
-                                            speed=int(speeds[i])/1000000))
-                except KeyError:
-                    ifaces.append(Interface(description=descriptions[i],
-                                            port_id=int(port_ids[i]),
-                                            status=statuses[i],
-                                            operational_mode=op_modes[i],
-                                            speed=int(speeds[i])/1000000))
-            return ifaces
 
         if_descriptions = self.bulk(self.OIDS['interfaces']['description'])
         if_port_ids = self.bulk(self.OIDS['interfaces']['index'])
@@ -69,8 +54,32 @@ class SnmpGateway(SnmpUtils):
         if_vlans = super(SnmpGateway, self).bulk(self.OIDS['interfaces']['vlan'])  # Using the library method
         if_speeds = self.bulk(self.OIDS['interfaces']['speed'])
         if_macs = self.bulk(self.OIDS['interfaces']['mac_address'])
-        return parse_interface_list(if_descriptions, if_port_ids, if_statuses, if_op_modes, if_vlans, if_speeds,
-                                    if_macs)
+        all_vlans = self.get_all_vlans()
+        vlans_by_id = {}
+        for vl in all_vlans:
+            vlans_by_id[vl.dot1q_id] = vl
+
+        ifaces = []
+        times = []
+        for i in range(len(if_descriptions) - 1):
+            t0 = time.process_time()
+            try:
+                ifaces += [Interface(description=if_descriptions[i],
+                                        port_id=int(if_port_ids[i]),
+                                        status=if_statuses[i],
+                                        operational_mode=if_op_modes[i],
+                                        vlan=vlans_by_id[if_vlans[self.OIDS['interfaces']['vlan'] + f'.{if_port_ids[i]}']],
+                                        speed=int(if_speeds[i]) / 1000000)]
+                print('VLAN !')
+            except KeyError:
+                ifaces += [Interface(description=if_descriptions[i],
+                                        port_id=int(if_port_ids[i]),
+                                        status=if_statuses[i],
+                                        operational_mode=if_op_modes[i],
+                                        speed=int(if_speeds[i]) / 1000000)]
+            print(t0)
+            times.append(t0)
+        return ifaces, times
 
     def get_vlan_by_id(self, vlan_id):
         if vlan_id:
