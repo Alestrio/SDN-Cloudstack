@@ -65,7 +65,7 @@ class SnmpGateway(SnmpUtils):
                                         port_id=int(if_port_ids[i]),
                                         status=if_statuses[i],
                                         operational_mode=if_op_modes[i],
-                                        vlan=vlans_by_id[if_vlans[self.OIDS['interfaces']['vlan'] + f'.{if_port_ids[i]}']],
+                                        vlan=vlans_by_id[int(if_vlans[self.OIDS['interfaces']['vlan'] + f'.{if_port_ids[i]}'])],
                                         speed=int(if_speeds[i]) / 1000000)]
             except KeyError:
                 ifaces += [Interface(description=if_descriptions[i],
