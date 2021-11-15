@@ -51,28 +51,41 @@ class SnmpGateway(SnmpUtils):
         if_op_modes = self.bulk(self.OIDS['interfaces']['op_mode'])
         if_vlans = super(SnmpGateway, self).bulk(self.OIDS['interfaces']['vlan'])  # Using the library method
         if_speeds = self.bulk(self.OIDS['interfaces']['speed'])
+        if_trunk_modes = super(SnmpGateway, self).bulk(self.OIDS['interfaces']['trunk_mode'])
         if_macs = self.bulk(self.OIDS['interfaces']['mac_address'])
         all_vlans = self.get_all_vlans()
         vlans_by_id = {}
         for vl in all_vlans:
             vlans_by_id[vl.dot1q_id] = vl
+        trunk_modes_by_id = {}
+        for tm in if_trunk_modes:
+            trunk_modes_by_id[int(tm.split('.')[-1])] = if_trunk_modes[tm]
 
         ifaces = []
-        times = []
         for i in range(len(if_descriptions) - 1):
             try:
                 ifaces += [Interface(description=if_descriptions[i],
                                         port_id=int(if_port_ids[i]),
                                         status=if_statuses[i],
+                                        trunk_mode=trunk_modes_by_id[int(if_port_ids[i])],
                                         operational_mode=if_op_modes[i],
                                         vlan=vlans_by_id[int(if_vlans[self.OIDS['interfaces']['vlan'] + f'.{if_port_ids[i]}'])],
                                         speed=int(if_speeds[i]) / 1000000)]
             except KeyError:
-                ifaces += [Interface(description=if_descriptions[i],
-                                        port_id=int(if_port_ids[i]),
-                                        status=if_statuses[i],
-                                        operational_mode=if_op_modes[i],
-                                        speed=int(if_speeds[i]) / 1000000)]
+                try:
+                    ifaces += [Interface(description=if_descriptions[i],
+                                            port_id=int(if_port_ids[i]),
+                                            status=if_statuses[i],
+                                            trunk_mode=trunk_modes_by_id[int(if_port_ids[i])],
+                                            operational_mode=if_op_modes[i],
+                                            speed=int(if_speeds[i]) / 1000000)]
+                except KeyError:
+                    ifaces += [Interface(description=if_descriptions[i],
+                                         port_id=int(if_port_ids[i]),
+                                         status=if_statuses[i],
+                                         trunk_mode=-10,
+                                         operational_mode=if_op_modes[i],
+                                         speed=int(if_speeds[i]) / 1000000)]
         return ifaces
 
     def get_vlan_by_id(self, vlan_id):
@@ -91,12 +104,14 @@ class SnmpGateway(SnmpUtils):
         if_status = self.findById(self.OIDS['interfaces']['status'], interface_id)
         if_op_mode = self.findById(self.OIDS['interfaces']['op_mode'], interface_id)
         if_vlan = self.findById(self.OIDS['interfaces']['vlan'], interface_id)
+        if_trunk_mode = self.findById(self.OIDS['interfaces']['trunk_mode'], interface_id)
         if_speed = self.findById(self.OIDS['interfaces']['speed'], interface_id)
         if_mac = self.findById(self.OIDS['interfaces']['mac_address'], interface_id)
         if str(interface_id) == if_port_id:
             return Interface(description=if_description,
                             port_id=int(if_port_id),
                             status=if_status,
+                            trunk_mode=if_trunk_mode,
                             operational_mode=if_op_mode,
                             vlan=(self.get_vlan_by_id(int(if_vlan)) if if_vlan else None),
                             speed=(int(if_speed)/1000000 if if_speed else 0))
@@ -104,7 +119,13 @@ class SnmpGateway(SnmpUtils):
             return None
 
     def set_interface_vlan(self, interface_id, vlan_id):
-        pass
+        try:
+            self.set({self.OIDS['interfaces']['sets']['trunk_mode'] +f'.{interface_id}': 2})
+        except RuntimeError:
+            pass
+        finally:
+            self.set({self.OIDS['interfaces']['sets']['vlan'] +f'.{interface_id}': vlan_id})
+        return True
 
     def get_cdp_neighbors(self):
         pass

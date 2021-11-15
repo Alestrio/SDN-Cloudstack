@@ -33,6 +33,7 @@ class Interface(BaseModel):
     port_id: int
     status: Optional[str]
     operational_mode: Union[str, int]  # Can be provided as int for config creation
+    trunk_mode: Union[str, int]
     vlan: Optional[Union[Vlan, int]]
     speed: Optional[int]
 

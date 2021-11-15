@@ -4,8 +4,55 @@ from types import SimpleNamespace
 
 from pysnmp.entity.engine import SnmpEngine
 from pysnmp.entity.rfc3413.oneliner import cmdgen
-from pysnmp.hlapi import nextCmd, CommunityData, UdpTransportTarget, ContextData
+from pysnmp.hlapi import nextCmd, CommunityData, UdpTransportTarget, ContextData, Integer
 from pysnmp.smi.rfc1902 import ObjectType, ObjectIdentity
+import pysnmp
+
+
+def construct_value_pairs(list_of_pairs):
+    pairs = []
+    for key, value in list_of_pairs.items():
+        pairs.append(pysnmp.hlapi.ObjectType(pysnmp.hlapi.ObjectIdentity(key), Integer(value)))
+    return pairs
+
+
+def construct_object_types(list_of_oids):
+    object_types = []
+    for oid in list_of_oids:
+        object_types.append(pysnmp.hlapi.ObjectType(pysnmp.hlapi.ObjectIdentity(oid)))
+    return object_types
+
+
+def cast(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            try:
+                return str(value)
+            except (ValueError, TypeError):
+                pass
+    return value
+
+
+def fetch(handler, count):
+    result = []
+    for i in range(count):
+        try:
+            error_indication, error_status, error_index, var_binds = next(handler)
+            if not error_indication and not error_status:
+                items = {}
+                for var_bind in var_binds:
+                    items[str(var_bind[0])] = cast(var_bind[1])
+                result.append(items)
+            else:
+                print(error_indication, error_status)
+                raise RuntimeError('Got SNMP error: {0} {1}'.format(error_indication, error_status))
+        except StopIteration:
+            break
+    return result
 
 
 class SnmpUtils:
@@ -56,19 +103,15 @@ class SnmpUtils:
 
         return results
 
-    def set(self, oid, value):
-        errorIndication, errorStatus, errorIndex, varBinds = cmdgen.CommandGenerator().setCmd(
-            cmdgen.CommunityData(self.community),
-            cmdgen.UdpTransportTarget((self.host, self.port)),
-            (ObjectType(ObjectIdentity(oid)), value)
+    def set(self, value_pairs, engine=pysnmp.hlapi.SnmpEngine(), context=pysnmp.hlapi.ContextData()):
+        handler = pysnmp.hlapi.setCmd(
+            engine,
+            pysnmp.hlapi.CommunityData(self.community),
+            pysnmp.hlapi.UdpTransportTarget((self.host, self.port)),
+            context,
+            *construct_value_pairs(value_pairs)
         )
-        if errorIndication:
-            print(errorIndication)
-        elif errorStatus:
-            print('%s at %s' % (
-                errorStatus.prettyPrint(),
-                errorIndex and varBinds[int(errorIndex) - 1][0] or '?'
-            ))
+        return fetch(handler, 1)[0]
 
     def walk(self, oid, n=0, dotPrefix=False):
         if dotPrefix:
