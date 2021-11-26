@@ -7,6 +7,7 @@
 
 
 import sys
+import asyncio
 
 import uvicorn as uvicorn
 import yaml
@@ -37,8 +38,8 @@ def get_vlans():
 
 
 @api.get(f"{ROUTE_PREFIX}/interfaces")
-def get_interfaces():
-    response = gateway.get_all_interfaces()
+async def get_interfaces():
+    response = await gateway.get_all_interfaces()
     return response
 
 
