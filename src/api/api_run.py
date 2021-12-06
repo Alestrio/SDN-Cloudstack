@@ -44,11 +44,20 @@ def get_vlan_id(vl_id: int):
 
 @api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):
-    raise HTTPException(status_code=404, detail="Interface not found")
+    # Return an interface by its id
+    #try:
+    interface = operations.get_interface_by_id(if_id)
+    return interface
+    #except Exception as e:
+        #raise HTTPException(status_code=404, detail="Interface not found")
 
 @api.post(ROUTE_PREFIX+"/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
-    raise HTTPException(status_code=404, detail="Interface or Vlan not found")
+    # Set a vlan on an interface
+    #try:
+    operations.set_interface_vlan(body.vlan_id, if_id)
+    #except Exception as e:
+    #    raise HTTPException(status_code=404, detail="Interface or Vlan not found")
 
 
 @api.get(f"{ROUTE_PREFIX}/neighbors")
