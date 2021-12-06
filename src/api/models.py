@@ -44,4 +44,13 @@ class Config(BaseModel):
     That class defines the JSON model for add_config POST request
     """
     interfaces: list[Interface]
+    vlans: list[Vlan]
 
+class CdpNeighbor(BaseModel):
+    """
+    That class defines a CDP neighbor as it is described in JSONs sent and received by the API
+    """
+    ip: str
+    fqdn: str
+    interface: str
+    model: str

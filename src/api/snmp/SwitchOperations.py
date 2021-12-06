@@ -1,9 +1,10 @@
 import asyncio
+import ipaddress
 
 import snmp_cmds
 from models import *
 
-from src.api.models import Interface, Vlan
+from src.api.models import Interface, Vlan, CdpNeighbor
 from src.api.snmp.SnmpUtils import SnmpUtils
 
 
@@ -81,3 +82,30 @@ class SwitchOperations:
                 if vlan.dot1q_id == interface.vlan:
                     interface.vlan = vlan
         return interfaces
+
+    def get_cdp_neighbors(self):
+        """Return a list of cdp neighbors
+        using those oids :
+        cdp_neighbors:
+            ip: 1.3.6.1.4.1.9.9.23.1.2.1.1.4.15
+            fqdn: 1.3.6.1.4.1.9.9.23.1.2.1.1.6.15
+            interface: 1.3.6.1.4.1.9.9.23.1.2.1.1.7.15
+            model: 1.3.6.1.4.1.9.9.23.1.2.1.1.8.15
+         """
+        utils = SnmpUtils(self.ip, self.port, self.community)
+        cdp_ips = list(utils.bulk(self.config['cdp_neighbors']['ip']).values())
+        cdp_fqdns = list(utils.bulk(self.config['cdp_neighbors']['fqdn']).values())
+        cdp_interfaces = list(utils.bulk(self.config['cdp_neighbors']['interface']).values())
+        cdp_models = list(utils.bulk(self.config['cdp_neighbors']['model']).values())
+
+        cdp_neighbors = []
+        for i in range(len(cdp_ips)):
+            cdp_neighbors.append(CdpNeighbor(
+                 # convert ip from hex to human readable
+                ip=str(ipaddress.IPv4Address(int(cdp_ips[i], 16))),
+                fqdn=cdp_fqdns[i],
+                interface=cdp_interfaces[i],
+                model=cdp_models[i]
+            ))
+        return cdp_neighbors
+

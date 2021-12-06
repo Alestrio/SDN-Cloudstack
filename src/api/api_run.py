@@ -4,7 +4,7 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-
+import json
 
 import uvicorn as uvicorn
 import yaml
@@ -53,14 +53,20 @@ def set_vlan_on_interface(if_id: int, body: VlanId):
 
 @api.get(f"{ROUTE_PREFIX}/neighbors")
 def get_cdp_neighbors():
-    pass
+    # Return the CDP neighbors from the switch
+    #try:
+    neighbors = operations.get_cdp_neighbors()
+    #except Exception as e:
+    #    raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
+
+    return neighbors
 
 
 @api.post(f"{ROUTE_PREFIX}/config")
 def add_config(configuration: Config):
     # Add a config from a YAML body to the mongoDB database
     try:
-        db.add_config(configuration)
+        db.add_config(configuration.dict())
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while inserting configuration')
 

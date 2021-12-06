@@ -4,6 +4,7 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
+import json
 
 import pymongo
 import yaml
@@ -24,7 +25,11 @@ class Database:
         Get the configs stored in database
         :return: List of configs
         """
-        return self.configs_collections.find()
+        configs = []
+        for config in self.configs_collections.find({}):
+            config['_id'] = str(config['_id']).replace('ObjectId(', '').replace(')', '')
+            configs.append(config)
+        return configs
 
     def add_config(self, config: dict):
         """
