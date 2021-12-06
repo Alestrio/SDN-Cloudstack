@@ -32,3 +32,18 @@ class Database:
         :param config: Dictionary of the configuration
         """
         self.configs_collections.insert_one(config)
+
+    def get_config(self, config_id):
+        """
+        Get a config from the database
+        :param config_id: Id of the config
+        :return: Config
+        """
+        return self.configs_collections.find_one({'_id': config_id})
+
+    def delete_config(self, config_id):
+        """
+        Delete a config from the database
+        :param config_id: Id of the config
+        """
+        self.configs_collections.delete_one({'_id': config_id})
