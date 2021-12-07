@@ -132,6 +132,28 @@ def rebuild_cache():
     return {'message': 'Cache rebuilt'}
 
 
+@api.get(ROUTE_PREFIX+"/hostname")
+def get_hostname():
+    # Return the hostname of the switch
+    try:
+        hostname = operations.get_hostname()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting hostname')
+
+    return {'hostname': hostname}
+
+
+@api.get(ROUTE_PREFIX+"/uptime")
+def get_uptime():
+    # Return the uptime of the switch
+    try:
+        uptime = operations.get_uptime()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting uptime')
+
+    return {'uptime': uptime}
+
+
 if __name__ == "__main__":
     uvicorn.run(api, host='127.0.0.1', debug=True)
 

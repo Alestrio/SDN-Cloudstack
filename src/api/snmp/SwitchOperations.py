@@ -1,4 +1,3 @@
-import asyncio
 import ipaddress
 import threading
 
@@ -209,7 +208,7 @@ class SwitchOperations:
         self.get_vlannames_and_ids()
         self.get_cdp_neighbors()
         self.get_interfaces()
-        print("cache rebuilt")
+        #print("cache rebuilt")
 
     def rebuild_cache_background(self):
         """Rebuild the beaker cache in the background"""
@@ -223,3 +222,14 @@ class SwitchOperations:
             if vlan.dot1q_id == vlan_id:
                 return vlan
         return None
+
+    def get_hostname(self):
+        """Return the hostname of the switch"""
+        return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
+                                  oid=self.config['systemName'])[0][1]
+
+    def get_uptime(self):
+        """Return the uptime of the switch"""
+        return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
+                                  oid=self.config['uptime'])[0][1]
+
