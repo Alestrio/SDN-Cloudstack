@@ -98,8 +98,11 @@ class SnmpUtils:
 
         results = {}
         for varBindTableRow in varBindTable:
-            for name, val in varBindTableRow:
-                results[str(name)] = str(varBindTableRow[0]).split(" = ")[1]
+            for line in varBindTableRow:
+                if not 'EndOfMibView' in str(line):
+                    results[str(line).split(" = ")[0]
+                    .replace('SNMPv2-SMI::enterprises', '1.3.6.1.4.1')
+                    .replace('SNMPv2-SMI::mib-2', '1.3.6.1.2.1')] = str(line).split(" = ")[1]
 
         return results
 
