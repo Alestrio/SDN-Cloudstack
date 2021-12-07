@@ -120,6 +120,18 @@ def delete_config(config_id: str):
     return {'message': 'Configuration deleted'}
 
 
+@api.get(ROUTE_PREFIX+"/rebuild")
+def rebuild_cache():
+    # Rebuild the cache from the switch
+    try:
+        operations.rebuild_cache()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while rebuilding cache \n'
+                                                    'Either the switch is offline/unreachable or the credentials'
+                                                    ' are wrong')
+    return {'message': 'Cache rebuilt'}
+
+
 if __name__ == "__main__":
     uvicorn.run(api, host='127.0.0.1', debug=True)
 
