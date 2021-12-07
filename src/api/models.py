@@ -29,11 +29,12 @@ class Interface(BaseModel):
     """
     That class defines an interface as it is described in JSONs sent and received by the API
     """
+    name: str
     description: str
     port_id: int
     status: Optional[str]
-    operational_mode: Union[str, int]  # Can be provided as int for config creation
-    trunk_mode: Union[str, int]
+    operstatus: Union[str, int]  # Can be provided as int for config creation
+    trunk_mode: Optional[Union[str, int]]
     vlan: Optional[Union[Vlan, int]]
     speed: Optional[int]
 
@@ -43,4 +44,13 @@ class Config(BaseModel):
     That class defines the JSON model for add_config POST request
     """
     interfaces: list[Interface]
+    vlans: list[Vlan]
 
+class CdpNeighbor(BaseModel):
+    """
+    That class defines a CDP neighbor as it is described in JSONs sent and received by the API
+    """
+    ip: str
+    fqdn: str
+    interface: str
+    model: str

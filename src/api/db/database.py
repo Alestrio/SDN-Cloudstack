@@ -4,6 +4,7 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
+import json
 
 import pymongo
 import yaml
@@ -24,7 +25,11 @@ class Database:
         Get the configs stored in database
         :return: List of configs
         """
-        return self.configs_collections.find()
+        configs = []
+        for config in self.configs_collections.find({}):
+            config['_id'] = str(config['_id']).replace('ObjectId(', '').replace(')', '')
+            configs.append(config)
+        return configs
 
     def add_config(self, config: dict):
         """
@@ -32,3 +37,18 @@ class Database:
         :param config: Dictionary of the configuration
         """
         self.configs_collections.insert_one(config)
+
+    def get_config(self, config_id):
+        """
+        Get a config from the database
+        :param config_id: Id of the config
+        :return: Config
+        """
+        return self.configs_collections.find_one({'_id': config_id})
+
+    def delete_config(self, config_id):
+        """
+        Delete a config from the database
+        :param config_id: Id of the config
+        """
+        self.configs_collections.delete_one({'_id': config_id})
