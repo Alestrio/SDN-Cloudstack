@@ -1,8 +1,9 @@
 import asyncio
 import ipaddress
+import threading
 
 import beaker.cache
-from beaker import cache_region
+from beaker.cache import cache_region, cache_regions
 
 import snmp_cmds
 from models import *
@@ -30,15 +31,16 @@ class SwitchOperations:
         self.community = community
         self.config = config
         # defining beaker cache regions
-        cache_region.cache_regions.update(
+        cache_regions.update(
             {
                 'api_data': {
                     'type': 'memory',
-                    'expire': 300,
+                    'expire': 60 * 10,  # 10mn
                     'key_length': 250
                 }
             }
         )
+        self.rebuild_cache_background()
 
     # This needs to be cached
     @cache_region('api_data')
@@ -124,7 +126,7 @@ class SwitchOperations:
         cdp_neighbors = []
         for i in range(len(cdp_ips)):
             cdp_neighbors.append(CdpNeighbor(
-                 # convert ip from hex to human readable
+                # convert ip from hex to human readable
                 ip=str(ipaddress.IPv4Address(int(cdp_ips[i], 16))),
                 fqdn=cdp_fqdns[i],
                 interface=cdp_interfaces[i],
@@ -135,9 +137,10 @@ class SwitchOperations:
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
-                          oid=self.config['interfaces']['oids']['sets']['vlan']+'.'+str(interface_id),
+                          oid=self.config['interfaces']['oids']['sets']['vlan'] + '.' + str(interface_id),
                           value=str(dot1q_id),
                           value_type='i')
+        self.rebuild_cache_background()
 
     def get_interface_by_id(self, interface_id):
         """Return an interface by its id"""
@@ -151,6 +154,7 @@ class SwitchOperations:
 
         vlan_name = utils.findById(self.config['vlans']['name'], if_vlan)
 
+        self.rebuild_cache_background()
         return Interface(
             vlan=Vlan(
                 dot1q_id=if_vlan,
@@ -171,9 +175,10 @@ class SwitchOperations:
                           value=str(vlan.dot1q_id),
                           value_type='i')
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
-                          oid=self.config['vlans']['oids']['name']+'.'+str(vlan.dot1q_id),
+                          oid=self.config['vlans']['oids']['name'] + '.' + str(vlan.dot1q_id),
                           value=vlan.name,
                           value_type='s')
+        self.rebuild_cache_background()
 
     def translate_config_and_set_to_switch(self, config: Config, switch: str, port: int, community: str):
         """Translate a config and set it to a switch
@@ -188,15 +193,33 @@ class SwitchOperations:
         for vlan in config.vlans:
             if vlan not in vlans:
                 self.add_vlan(vlan)
+        # rebuild the cache
+        self.rebuild_cache_background()
+        return
 
     def invalidate_cache(self):
         """Invalidate the beaker cache"""
-        beaker.cache.region_invalidate("api_data")
+        beaker.cache.region_invalidate(self.get_vlannames_and_ids, "api_data")
+        beaker.cache.region_invalidate(self.get_cdp_neighbors, "api_data")
+        beaker.cache.region_invalidate(self.get_interfaces, "api_data")
 
     def rebuild_cache(self):
         """Rebuild the beaker cache"""
-        beaker.cache.region_invalidate("api_data")
+        self.invalidate_cache()
         self.get_vlannames_and_ids()
         self.get_cdp_neighbors()
         self.get_interfaces()
+        print("cache rebuilt")
 
+    def rebuild_cache_background(self):
+        """Rebuild the beaker cache in the background"""
+        threading.Thread(target=self.rebuild_cache).start()
+
+    def get_vlan_by_id(self, vlan_id):
+        """Return a vlan by its id"""
+        vlans = self.get_vlannames_and_ids()
+        self.rebuild_cache_background()
+        for vlan in vlans:
+            if vlan.dot1q_id == vlan_id:
+                return vlan
+        return None

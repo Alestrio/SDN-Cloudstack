@@ -29,7 +29,7 @@ except FileNotFoundError:
 @api.get(f"{ROUTE_PREFIX}/vlans")
 def get_vlans():
     """Returns the list of vlans by issuing an SNMP Table request on the switch with snmp_cmds"""
-
+    return operations.get_vlannames_and_ids()
 
 
 @api.get(f"{ROUTE_PREFIX}/interfaces")
@@ -40,33 +40,38 @@ def get_interfaces():
 
 @api.get(ROUTE_PREFIX+"/vlans/{vl_id}")
 def get_vlan_id(vl_id: int):
-    raise HTTPException(status_code=404, detail="Vlan not found")
+    # Return a vlan from operations by it's id
+    try:
+        vlan = operations.get_vlan_by_id(vl_id)
+        return vlan
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Vlan not found")
 
 @api.get(ROUTE_PREFIX+"/interfaces/{if_id}")
 def get_if_id(if_id: int):
     # Return an interface by its id
-    #try:
-    interface = operations.get_interface_by_id(if_id)
-    return interface
-    #except Exception as e:
-        #raise HTTPException(status_code=404, detail="Interface not found")
+    try:
+        interface = operations.get_interface_by_id(if_id)
+        return interface
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Interface not found")
 
 @api.post(ROUTE_PREFIX+"/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
     # Set a vlan on an interface
-    #try:
-    operations.set_interface_vlan(body.vlan_id, if_id)
-    #except Exception as e:
-    #    raise HTTPException(status_code=404, detail="Interface or Vlan not found")
+    try:
+        operations.set_interface_vlan(body.vlan_id, if_id)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Interface or Vlan not found")
 
 
 @api.get(f"{ROUTE_PREFIX}/neighbors")
 def get_cdp_neighbors():
     # Return the CDP neighbors from the switch
-    #try:
-    neighbors = operations.get_cdp_neighbors()
-    #except Exception as e:
-    #    raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
+    try:
+        neighbors = operations.get_cdp_neighbors()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
 
     return neighbors
 
