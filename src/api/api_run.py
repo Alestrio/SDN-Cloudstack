@@ -4,13 +4,10 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-import json
 
-import uvicorn as uvicorn
-import yaml
+import uvicorn
 
 from fastapi import FastAPI, HTTPException
-from snmp.SwitchOperations import SwitchOperations as SwitchOperations
 from src.api.routers import config_router, general_infos_router, interface_router, misc_router, vlan_router
 
 api = FastAPI()
