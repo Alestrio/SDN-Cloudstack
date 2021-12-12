@@ -131,13 +131,22 @@ class SwitchOperations:
 
         cdp_neighbors = []
         for i in range(len(cdp_ips)):
-            cdp_neighbors.append(CdpNeighbor(
-                # convert ip from hex to human readable
-                ip=str(ipaddress.IPv4Address(int(cdp_ips[i], 16))),
-                fqdn=cdp_fqdns[i],
-                interface=cdp_interfaces[i],
-                model=cdp_models[i]
-            ))
+            try:
+                cdp_neighbors.append(CdpNeighbor(
+                    # convert ip from hex to human readable
+                    ip=str(ipaddress.IPv4Address(int(cdp_ips[i], 16))),
+                    fqdn=cdp_fqdns[i],
+                    interface=cdp_interfaces[i],
+                    model=cdp_models[i]
+                ))
+            except ValueError:
+                cdp_neighbors.append(CdpNeighbor(
+                    # convert ip from hex to human readable
+                    ip="0.0.0.0",
+                    fqdn=cdp_fqdns[i],
+                    interface=cdp_interfaces[i],
+                    model=cdp_models[i]
+                ))
         return cdp_neighbors
 
     def set_interface_vlan(self, dot1q_id, interface_id):
@@ -215,7 +224,7 @@ class SwitchOperations:
         self.get_vlannames_and_ids()
         self.get_cdp_neighbors()
         self.get_interfaces()
-        #print("cache rebuilt")
+        # print("cache rebuilt")
 
     def rebuild_cache_background(self):
         """Rebuild the beaker cache in the background"""
@@ -239,4 +248,3 @@ class SwitchOperations:
         """Return the uptime of the switch"""
         return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
                                   oid=self.config['uptime'])[0][1]
-
