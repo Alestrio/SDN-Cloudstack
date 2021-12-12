@@ -33,6 +33,18 @@ def get_if_id(if_id: int):
         raise HTTPException(status_code=404, detail="Interface not found")
 
 
+@router.get("/interfaces/by_vlan/{vlan_id}")
+def get_interfaces_by_vlan(vlan_id: int):
+    # Return interfaces by vlan id
+    try:
+        interfaces = operations.get_interfaces_by_vlan(vlan_id)
+        if len(interfaces) == 0:
+            return {"message": "No interface found"}
+        return interfaces
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Interfaces not found")
+
+
 @router.post("/interfaces/{if_id}")
 def set_vlan_on_interface(if_id: int, body: VlanId):
     # Set a vlan on an interface
@@ -40,3 +52,5 @@ def set_vlan_on_interface(if_id: int, body: VlanId):
         operations.set_interface_vlan(body.vlan_id, if_id)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Interface or Vlan not found")
+
+    return {"message": "Vlan set on interface"}

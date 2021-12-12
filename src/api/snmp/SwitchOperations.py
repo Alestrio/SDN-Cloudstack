@@ -183,6 +183,15 @@ class SwitchOperations:
             speed=if_speed,
         )
 
+    def get_interfaces_by_vlan(self, vlan_id):
+        # We need to get the interfaces from the cache using the vlan_id
+        interfaces = []
+        for interface in self.get_interfaces():
+            if interface.vlan:
+                if interface.vlan.dot1q_id == vlan_id:
+                    interfaces.append(interface)
+        return interfaces
+
     def add_vlan(self, vlan):
         """Add a vlan to the switch"""
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
