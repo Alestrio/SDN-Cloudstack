@@ -14,7 +14,7 @@ from beaker.cache import cache_region, cache_regions
 import snmp_cmds
 from models import *
 
-from src.api.models import Interface, Vlan, CdpNeighbor, Config
+from src.api.models import Interface, Vlan, CdpNeighbor, Config, Trunk, TrunkBrief
 from src.api.snmp.SnmpUtils import SnmpUtils
 
 
@@ -81,26 +81,15 @@ class SwitchOperations:
             # We need to extract every information to put it in Interface object
             # We need to extract the interface name, the interface id, the interface description, the interface status
             # the interface operstatus, the interface speed, the interface trunk status, the interface vlan
-            try:
-                interfaces.append(Interface(
-                    vlan=int(if_vlans[interface['ifIndex']]),
-                    name=interface['ifDescr'],
-                    port_id=interface['ifIndex'],
-                    description=interface['ifDescr'],
-                    status=interface['ifOperStatus'],
-                    operstatus=interface['ifOperStatus'],
-                    speed=interface['ifSpeed'],
-                ))
-            except KeyError:
-                interfaces.append(Interface(
-                    vlan=None,
-                    name=interface['ifDescr'],
-                    port_id=interface['ifIndex'],
-                    description=interface['ifDescr'],
-                    status=interface['ifOperStatus'],
-                    operstatus=interface['ifOperStatus'],
-                    speed=interface['ifSpeed'],
-                ))
+            interfaces.append(Interface(
+                vlan=int(if_vlans.get(interface['ifIndex'])) if if_vlans.get(interface['ifIndex']) else None,
+                name=interface['ifDescr'],
+                port_id=interface['ifIndex'],
+                description=interface['ifDescr'],
+                status=interface['ifOperStatus'],
+                operstatus=interface['ifOperStatus'],
+                speed=interface['ifSpeed'],
+            ))
         # We wait for the gather_vlans to finish
         # We need to add the vlans to the interfaces
         for interface in interfaces:
@@ -148,6 +137,76 @@ class SwitchOperations:
                     model=cdp_models[i]
                 ))
         return cdp_neighbors
+
+    @cache_region('api_data')
+    def get_trunks(self):
+        """returns trunks table as json"""
+        trunks = []
+        interfaces = self.get_interfaces()
+        vlans = self.get_vlannames_and_ids()
+        utils = SnmpUtils(self.ip, self.port, self.community)
+        domains = utils.bulk(self.config['trunks']['oids']['domain'])
+        # last item in oid of domains
+        indexes = [int(i.split('.')[-1]) for i in domains.keys()]
+        domains = list(domains.values())
+        tagged_vlans = utils.bulk(self.config['trunks']['oids']['vlans'])
+        native_vlan = list(utils.bulk(self.config['trunks']['oids']['native']).values())
+        statuses = list(utils.bulk(self.config['trunks']['oids']['status']).values())
+        for i in range(len(indexes)):
+            interface = None
+            for j in interfaces:
+                if j.port_id == indexes[i]:
+                    interface = j
+            tr_native_vlan = None
+            for j in vlans:
+                if j.dot1q_id == int(native_vlan[i]):
+                    tr_native_vlan = j
+            # Parsing binary value as vlans
+            tr_tagged_vlans = []
+
+            for value, key in tagged_vlans.items():
+                vlan_d1qid = key.split('.')[-1]
+                value = bin(int.from_bytes(value.encode(), byteorder='big'))[2:]
+                membership = int(value[indexes[i]])
+                if membership == 1:
+                    for j in vlans:
+                        if j.dot1q_id == int(vlan_d1qid):
+                            tr_tagged_vlans.append(j)
+            """if tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])):
+                tg_vls = bin(int.from_bytes(tagged_vlans
+                                            .get(self.config['trunks']['oids']['vlans'] + '.' +
+                                                 str(indexes[i])).encode(), byteorder='big'))
+                for tag_vl in range(len(tg_vls)):
+                    # https://community.cisco.com/t5/small-business-switches/snmp-get-the-untagged-and-tagged-vlans-on-a-trunk-port-cisco/td-p/3917846
+                    if tg_vls[tag_vl] == '1':
+                        tr_tagged_vlans.append(tag_vl)"""
+            trunks.append(Trunk(
+                interface=interface,
+                domain=domains[i],
+                native_vlan=tr_native_vlan,
+                tagged_vlans=tr_tagged_vlans,
+                status=statuses[i]
+            ))
+
+        return trunks
+
+    def get_trunks_brief(self):
+        trunks = self.get_trunks()
+        trunks_brief = []
+        for trunk in trunks:
+            trunks_brief.append(TrunkBrief(
+                interface_id=trunk.interface.port_id,
+                native_vlan=trunk.native_vlan,
+            ))
+        return trunks_brief
+
+    def get_trunk(self, interface_id):
+        """returns trunk table as json"""
+        trunks = self.get_trunks()
+        for trunk in trunks:
+            if trunk.interface.port_id == int(interface_id):
+                return trunk
+        return None
 
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
@@ -226,6 +285,7 @@ class SwitchOperations:
         beaker.cache.region_invalidate(self.get_vlannames_and_ids, "api_data")
         beaker.cache.region_invalidate(self.get_cdp_neighbors, "api_data")
         beaker.cache.region_invalidate(self.get_interfaces, "api_data")
+        beaker.cache.region_invalidate(self.get_trunks, "api_data")
 
     def rebuild_cache(self):
         """Rebuild the beaker cache"""
@@ -233,7 +293,8 @@ class SwitchOperations:
         self.get_vlannames_and_ids()
         self.get_cdp_neighbors()
         self.get_interfaces()
-        # print("cache rebuilt")
+        self.get_trunks()
+        print("cache rebuilt")
 
     def rebuild_cache_background(self):
         """Rebuild the beaker cache in the background"""
@@ -257,3 +318,4 @@ class SwitchOperations:
         """Return the uptime of the switch"""
         return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
                                   oid=self.config['uptime'])[0][1]
+

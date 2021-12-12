@@ -7,7 +7,7 @@
 
 
 from pydantic import BaseModel
-from pydantic.typing import Optional, Union
+from pydantic.typing import Optional, Union, List
 
 
 class VlanId(BaseModel):
@@ -35,7 +35,7 @@ class Interface(BaseModel):
     status: Optional[str]
     operstatus: Union[str, int]  # Can be provided as int for config creation
     trunk_mode: Optional[Union[str, int]]
-    vlan: Optional[Union[Vlan, int]]
+    vlan: Optional[Union[Vlan, int, None]]
     speed: Optional[int]
 
 
@@ -46,6 +46,7 @@ class Config(BaseModel):
     interfaces: list[Interface]
     vlans: list[Vlan]
 
+
 class CdpNeighbor(BaseModel):
     """
     That class defines a CDP neighbor as it is described in JSONs sent and received by the API
@@ -54,3 +55,21 @@ class CdpNeighbor(BaseModel):
     fqdn: str
     interface: str
     model: str
+
+
+class Trunk(BaseModel):
+    """
+    That class defines a trunk as it is described in JSONs sent and received by the API
+    """
+    interface: Union[Interface, int]
+    native_vlan: Union[Vlan, None]
+    tagged_vlans: list[int]
+    status: str
+
+
+class TrunkBrief(BaseModel):
+    """
+    That class defines a trunk as it is described in JSONs sent and received by the API
+    """
+    interface_id: int
+    native_vlan: Union[Vlan, None]
