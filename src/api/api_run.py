@@ -7,7 +7,7 @@
 
 import uvicorn
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from src.api.routers import config_router, general_infos_router, interface_router, misc_router, vlan_router
 
 api = FastAPI()
