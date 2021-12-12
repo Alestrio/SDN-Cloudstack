@@ -16,9 +16,9 @@ api = FastAPI()
 api.include_router(general_infos_router.router)
 api.include_router(interface_router.router)
 api.include_router(vlan_router.router)
+api.include_router(trunk_router.router)
 api.include_router(config_router.router)
 api.include_router(misc_router.router)
-api.include_router(trunk_router.router)
 
 if __name__ == "__main__":
     uvicorn.run(api, host='127.0.0.1', debug=True)
