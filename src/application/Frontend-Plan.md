@@ -7,7 +7,7 @@
 - Auth/Login
 - darkm-mode
 - multi-langue
-- while user is connected refresh application every 2 minutes
+- while user is cnnected refresh application every 2 minutes
 
 Config
 
@@ -18,4 +18,8 @@ Config
 Actif
 
 - Gestion des ports un a un
-- Diagnostique (Get-current-config + neighbor)
+- Diagnostique (-current-config + neighbor)
+
+Resume
+
+- Resume de l'ensemble des salles disponible.
