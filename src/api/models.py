@@ -38,14 +38,6 @@ class Interface(BaseModel):
     speed: Optional[int]
 
 
-class Config(BaseModel):
-    """
-    That class defines the JSON model for add_config POST request
-    """
-    interfaces: list[Interface]
-    vlans: list[Vlan]
-
-
 class CdpNeighbor(BaseModel):
     """
     That class defines a CDP neighbor as it is described in JSONs sent and received by the API
@@ -64,6 +56,16 @@ class Trunk(BaseModel):
     native_vlan: Union[Vlan, None]
     tagged_vlans: list[Union[Vlan, int]]
     status: str
+
+
+class Config(BaseModel):
+    """
+    That class defines the JSON model for add_config POST request
+    """
+    hostname: Optional[str]
+    interfaces: list[Interface]
+    vlans: list[Vlan]
+    trunks: list[Trunk]
 
 
 class TrunkBrief(BaseModel):

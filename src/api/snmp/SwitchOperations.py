@@ -335,9 +335,10 @@ class SwitchOperations:
 
     def get_running_config(self):
         """Return the running config of the switch"""
+        hostname = self.get_hostname()
         vlans = self.get_vlannames_and_ids()
         interfaces = self.get_interfaces()
         trunks = self.get_trunks()
 
-        config = Config(vlans=vlans, interfaces=interfaces, trunks=trunks)
+        config = Config(vlans=vlans, interfaces=interfaces, trunks=trunks, hostname=hostname)
         return config
