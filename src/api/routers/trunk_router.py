@@ -54,3 +54,14 @@ def get_trunk(id: str):
         return operations.get_trunk(id)
     except Exception as e:
         raise HTTPException(status_code=404, detail=str(e))
+
+
+@router.get("trunks/{dot1q_id}")
+def get_trunk_by_dot1q_id(dot1q_id: str):
+    """
+    Get a trunk by its dot1q id
+    """
+    try:
+        return operations.get_trunk_by_native_vlan(dot1q_id)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=str(e))

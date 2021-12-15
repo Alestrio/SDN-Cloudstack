@@ -34,7 +34,6 @@ class Interface(BaseModel):
     port_id: int
     status: Optional[str]
     operstatus: Union[str, int]  # Can be provided as int for config creation
-    trunk_mode: Optional[Union[str, int]]
     vlan: Optional[Union[Vlan, int, None]]
     speed: Optional[int]
 
@@ -63,7 +62,7 @@ class Trunk(BaseModel):
     """
     interface: Union[Interface, int]
     native_vlan: Union[Vlan, None]
-    tagged_vlans: list[int]
+    tagged_vlans: list[Union[Vlan, int]]
     status: str
 
 
@@ -73,3 +72,4 @@ class TrunkBrief(BaseModel):
     """
     interface_id: int
     native_vlan: Union[Vlan, None]
+    tagged_vlans: str

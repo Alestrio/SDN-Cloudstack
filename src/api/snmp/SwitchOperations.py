@@ -163,23 +163,23 @@ class SwitchOperations:
                     tr_native_vlan = j
             # Parsing binary value as vlans
             tr_tagged_vlans = []
-
-            for value, key in tagged_vlans.items():
-                vlan_d1qid = key.split('.')[-1]
-                value = bin(int.from_bytes(value.encode(), byteorder='big'))[2:]
-                membership = int(value[indexes[i]])
-                if membership == 1:
-                    for j in vlans:
-                        if j.dot1q_id == int(vlan_d1qid):
-                            tr_tagged_vlans.append(j)
-            """if tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])):
-                tg_vls = bin(int.from_bytes(tagged_vlans
-                                            .get(self.config['trunks']['oids']['vlans'] + '.' +
-                                                 str(indexes[i])).encode(), byteorder='big'))
-                for tag_vl in range(len(tg_vls)):
-                    # https://community.cisco.com/t5/small-business-switches/snmp-get-the-untagged-and-tagged-vlans-on-a-trunk-port-cisco/td-p/3917846
-                    if tg_vls[tag_vl] == '1':
-                        tr_tagged_vlans.append(tag_vl)"""
+            # https://www.perlmonks.org/?node_id=719096
+            # https://github.com/nocproject/noc/blob/10815c0a376ebf76325d154ef65609e03a41112d/sa/profiles/Cisco/IOS/get_switchport.py
+            # https://github.com/datagutten/switchinfo/blob/c354e542d4b72eea3992a3f92494329d9083756a/switchinfo/SwitchSNMP/Cisco.py
+            # Get tagged vlans for a trunk
+            # we need to compress the byte-string to get the vlans
+            if tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])) and \
+                    str(tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i]))) != '0x7' + 'f'*255:
+                tg_vls = str(tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])))[2:]
+                vlan_iterator = 0
+                for hex_symbol in tg_vls:
+                    binary_chain = format(int(str(hex_symbol), 16), '04b')
+                    for bit in binary_chain:
+                        if bit == '1':
+                            for vl in vlans:
+                                if vl.dot1q_id == vlan_iterator:
+                                    tr_tagged_vlans.append(vl)
+                        vlan_iterator += 1
             trunks.append(Trunk(
                 interface=interface,
                 domain=domains[i],
@@ -194,9 +194,14 @@ class SwitchOperations:
         trunks = self.get_trunks()
         trunks_brief = []
         for trunk in trunks:
+            vlans = ""
+            for vl in trunk.tagged_vlans:
+                vlans += str(vl.dot1q_id) + ", "
+            vlans = vlans[:-2]
             trunks_brief.append(TrunkBrief(
                 interface_id=trunk.interface.port_id,
                 native_vlan=trunk.native_vlan,
+                tagged_vlans=vlans,
             ))
         return trunks_brief
 
@@ -205,6 +210,14 @@ class SwitchOperations:
         trunks = self.get_trunks()
         for trunk in trunks:
             if trunk.interface.port_id == int(interface_id):
+                return trunk
+        return None
+
+    def get_trunk_by_native_vlan(self, native_vlan):
+        """returns trunk table as json"""
+        trunks = self.get_trunks()
+        for trunk in trunks:
+            if trunk.native_vlan.dot1q_id == int(native_vlan):
                 return trunk
         return None
 
