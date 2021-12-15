@@ -242,7 +242,7 @@ class SwitchOperations:
         # bit string as binary string
         bit_string = format(bit_string, '0256b')
         # format the binary string as octet string
-        octet_string = format(int(bit_string, 2), '02x')
+        octet_string = '0x' + format(int(bit_string, 2), '02x')
         # set the tagged vlan
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans'] + '.' + str(interface_id),
                           value=octet_string, community=self.community, value_type='OCTETSTR')
