@@ -247,6 +247,11 @@ class SwitchOperations:
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans'] + '.' + str(interface_id),
                           value=octet_string, community=self.community, value_type='OCTETSTR')
 
+    def set_trunk_native_vlan(self, interface_id, native_vlan):
+        """sets trunk native vlan"""
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['native'] + '.' + str(interface_id),
+                          value=native_vlan, community=self.community, value_type='INTEGER')
+
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
