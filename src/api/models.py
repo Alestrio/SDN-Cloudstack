@@ -57,6 +57,19 @@ class Trunk(BaseModel):
     tagged_vlans: list[Union[Vlan, int]]
     status: str
 
+    def get_tagged_vlans_bit_string(self):
+        """
+        This method returns a string of octets representing the tagged VLANs
+        """
+        bit_string = ''
+        for i in range(255 * 4):
+            for vl in self.tagged_vlans:
+                if vl.dot1q_id == i:
+                    bit_string += '1'
+            else:
+                bit_string += '0'
+        return bit_string
+
 
 class Config(BaseModel):
     """

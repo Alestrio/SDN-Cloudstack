@@ -7,6 +7,7 @@
 
 import ipaddress
 import threading
+from typing import Optional
 
 import beaker.cache
 from beaker.cache import cache_region, cache_regions
@@ -206,7 +207,7 @@ class SwitchOperations:
             ))
         return trunks_brief
 
-    def get_trunk(self, interface_id):
+    def get_trunk(self, interface_id) -> Optional[Trunk]:
         """returns trunk table as json"""
         trunks = self.get_trunks()
         for trunk in trunks:
@@ -221,6 +222,30 @@ class SwitchOperations:
             if trunk.native_vlan.dot1q_id == int(native_vlan):
                 return trunk
         return None
+
+    def create_trunk(self, interface_id, native_vlan, tagged_vlans):
+        """creates trunk"""
+        pass
+
+    def add_tagged_vlan(self, interface_id, tagged_vlan):
+        """adds tagged vlan to trunk"""
+        # build the binary string
+        bit_string = ''
+        for i in range(255*4):
+            if i == int(tagged_vlan):
+                bit_string += '1'
+            else:
+                bit_string += '0'
+        # add the octet string to the trunk's tagged vlans
+        tagged_vls = int(self.get_trunk(interface_id).get_tagged_vlans_bit_string(), 2)
+        bit_string = int(bit_string, 2) | tagged_vls
+        # bit string as binary string
+        bit_string = format(bit_string, '0256b')
+        # format the binary string as octet string
+        octet_string = format(int(bit_string, 2), '02x')
+        # set the tagged vlan
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans'] + '.' + str(interface_id),
+                          value=octet_string, community=self.community, value_type='OCTETSTR')
 
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
