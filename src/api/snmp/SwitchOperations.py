@@ -169,7 +169,8 @@ class SwitchOperations:
             # Get tagged vlans for a trunk
             # we need to compress the byte-string to get the vlans
             if tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])) and \
-                    str(tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i]))) != '0x7' + 'f'*255:
+                    str(tagged_vlans.get(
+                        self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i]))) != '0x7' + 'f' * 255:
                 tg_vls = str(tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])))[2:]
                 vlan_iterator = 0
                 for hex_symbol in tg_vls:
@@ -332,3 +333,11 @@ class SwitchOperations:
         return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
                                   oid=self.config['uptime'])[0][1]
 
+    def get_running_config(self):
+        """Return the running config of the switch"""
+        vlans = self.get_vlannames_and_ids()
+        interfaces = self.get_interfaces()
+        trunks = self.get_trunks()
+
+        config = Config(vlans=vlans, interfaces=interfaces, trunks=trunks)
+        return config

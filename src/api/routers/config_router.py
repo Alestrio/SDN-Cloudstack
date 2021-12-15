@@ -8,7 +8,7 @@
 from fastapi import APIRouter, HTTPException
 
 from src.api.models import Config
-from src.api.routers import ROUTE_PREFIX, db
+from src.api.routers import ROUTE_PREFIX, db, operations
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Config"],
@@ -39,15 +39,25 @@ def get_configs():
     return {'configs': configs}
 
 
+@router.get("/configs/running")
+def get_running_config():
+    # Return the running config from the switch
+    try:
+        config = operations.get_running_config()
+        return config
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting running configuration')
+
+
 @router.get("/configs/{config_id}")
 def get_config(config_id: str):
     # Return a config from the mongoDB database
-    try:
-        config = db.get_config(config_id)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail='Server error while getting configuration')
+    #try:
+    config = db.get_config(config_id)
+    #except Exception as e:
+    #    raise HTTPException(status_code=500, detail='Server error while getting configuration')
 
-    return {config}
+    return config
 
 
 @router.delete("/configs/{config_id}")
