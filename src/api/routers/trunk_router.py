@@ -56,7 +56,7 @@ def get_trunk(id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.get("trunks/{dot1q_id}")
+@router.get("/trunks/dot1q_id/{dot1q_id}")
 def get_trunk_by_dot1q_id(dot1q_id: str):
     """
     Get a trunk by its dot1q id
