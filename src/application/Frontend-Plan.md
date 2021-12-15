@@ -7,6 +7,7 @@
 - Auth/Login
 - darkm-mode
 - multi-langue
+- while user is connected refresh application every 2 minutes
 
 Config
 
