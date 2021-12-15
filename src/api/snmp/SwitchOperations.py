@@ -223,15 +223,11 @@ class SwitchOperations:
                 return trunk
         return None
 
-    def create_trunk(self, interface_id, native_vlan, tagged_vlans):
-        """creates trunk"""
-        pass
-
     def add_tagged_vlan(self, interface_id, tagged_vlan):
         """adds tagged vlan to trunk"""
         # build the binary string
         bit_string = ''
-        for i in range(255*4):
+        for i in range(255 * 4):
             if i == int(tagged_vlan):
                 bit_string += '1'
             else:
@@ -251,6 +247,18 @@ class SwitchOperations:
         """sets trunk native vlan"""
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['native'] + '.' + str(interface_id),
                           value=native_vlan, community=self.community, value_type='INTEGER')
+
+    def create_trunk(self, interface_id, native_vlan, tagged_vlans):
+        """creates trunk"""
+        # set interface mode to trunk
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['interfaces']['oids']['sets']['trunk_mode'] +
+                          '.' + str(interface_id),
+                          value='1', community=self.community, value_type='INTEGER')
+        # set native vlan
+        self.set_trunk_native_vlan(interface_id, native_vlan)
+        # set tagged vlans
+        for vlan in tagged_vlans:
+            self.add_tagged_vlan(interface_id, vlan.dot1q_id)
 
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
