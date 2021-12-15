@@ -52,10 +52,10 @@ def get_running_config():
 @router.get("/configs/{config_id}")
 def get_config(config_id: str):
     # Return a config from the mongoDB database
-    #try:
-    config = db.get_config(config_id)
-    #except Exception as e:
-    #    raise HTTPException(status_code=500, detail='Server error while getting configuration')
+    try:
+        config = db.get_config(config_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting configuration')
 
     return config
 
