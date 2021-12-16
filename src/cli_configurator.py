@@ -74,3 +74,6 @@ class Cli_configurator:
             config = f"{self.set_vlan()}\n{self.set_interface()}\n{self.set_trunk()}"
             files.write(config)
 
+if __name__=="__main__":
+    config=Cli_configurator(input("Path : "))
+    config.create_config_files()
