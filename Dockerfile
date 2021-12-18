@@ -5,6 +5,5 @@ WORKDIR /api
 copy . .
 
 RUN pip install -r requirements.txt
-
-ENTRYPOINT ["python","./api.py"]
+ENTRYPOINT ["python",".src/api/api_run.py"]
 CMD ["no_config_specified"]
