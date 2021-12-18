@@ -1,0 +1,26 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: hugo_sdn_hugo
+    steps:
+    - uses: actions/checkout@v2
+    - name: Docker login
+      env:
+        DOCKER_USER = ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD = ${{secrets.DOCKER_PASSWORD}}
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+      working-directory: /home/user/api_actions
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag alestrio/sdn-cloudstack:$(date +%s)
+      working-directory: /home/user/api_actions
+    - name: Docker push
+      run: docker push ${{secrets.DOCKER_USER}}/sdn-cloudstack
+      working-directory: /home/user/api_actions
