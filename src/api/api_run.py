@@ -21,5 +21,5 @@ api.include_router(config_router.router)
 api.include_router(misc_router.router)
 
 if __name__ == "__main__":
-    uvicorn.run(api, host='127.0.0.1', debug=True)
+    uvicorn.run(api, host='listening_address', debug=True)
 
