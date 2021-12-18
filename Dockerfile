@@ -1,5 +1,7 @@
 FROM python:3.8
 
+WORKDIR /
+
 copy ./src/api /home/api/src/api
 copy ./config /home/api/src/api/config
 
