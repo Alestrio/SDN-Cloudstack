@@ -7,7 +7,7 @@ WORKDIR /home/api
 
 copy ./requirements.txt /home/api/requirements.txt
 copy ./src/api /home/api/src/api
-copy ./config /home/api/src/api/config
+copy ./config /home/api/config
 
 RUN pip install -r /home/api/requirements.txt
 
