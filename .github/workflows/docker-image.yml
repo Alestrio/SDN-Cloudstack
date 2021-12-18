@@ -22,5 +22,5 @@ jobs:
       run: docker image build . --file Dockerfile --tag alestrio/sdn-cloudstack:$(date +%s)
       working-directory: /home/user/api_actions/sdn-cloudstack
     - name: Docker push
-      run: docker image push ${{secrets.DOCKER_USER}}/sdn-cloudstack
+      run: docker image push ${{secrets.DOCKER_USER}}/sdn-cloudstack:$(date +%s)
       working-directory: /home/user/api_actions/sdn-cloudstack
