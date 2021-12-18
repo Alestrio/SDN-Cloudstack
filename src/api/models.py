@@ -7,7 +7,7 @@
 
 
 from pydantic import BaseModel
-from pydantic.typing import Optional, Union
+from pydantic.typing import Optional, Union, List
 
 
 class VlanId(BaseModel):
@@ -34,17 +34,9 @@ class Interface(BaseModel):
     port_id: int
     status: Optional[str]
     operstatus: Union[str, int]  # Can be provided as int for config creation
-    trunk_mode: Optional[Union[str, int]]
-    vlan: Optional[Union[Vlan, int]]
+    vlan: Optional[Union[Vlan, int, None]]
     speed: Optional[int]
 
-
-class Config(BaseModel):
-    """
-    That class defines the JSON model for add_config POST request
-    """
-    interfaces: list[Interface]
-    vlans: list[Vlan]
 
 class CdpNeighbor(BaseModel):
     """
@@ -54,3 +46,45 @@ class CdpNeighbor(BaseModel):
     fqdn: str
     interface: str
     model: str
+
+
+class Trunk(BaseModel):
+    """
+    That class defines a trunk as it is described in JSONs sent and received by the API
+    """
+    interface: Union[Interface, int]
+    native_vlan: Union[Vlan, None]
+    tagged_vlans: list[Union[Vlan, int]]
+    status: str
+
+    def get_tagged_vlans_bit_string(self):
+        """
+        This method returns a string of octets representing the tagged VLANs
+        """
+        bit_string = ''
+        for i in range(255 * 4):
+            for vl in self.tagged_vlans:
+                if vl.dot1q_id == i:
+                    bit_string += '1'
+            else:
+                bit_string += '0'
+        return bit_string
+
+
+class Config(BaseModel):
+    """
+    That class defines the JSON model for add_config POST request
+    """
+    hostname: Optional[str]
+    interfaces: list[Interface]
+    vlans: list[Vlan]
+    trunks: list[Trunk]
+
+
+class TrunkBrief(BaseModel):
+    """
+    That class defines a trunk as it is described in JSONs sent and received by the API
+    """
+    interface_id: int
+    native_vlan: Union[Vlan, None]
+    tagged_vlans: str
