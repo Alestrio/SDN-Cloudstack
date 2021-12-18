@@ -1,0 +1,13 @@
+api:
+  route_prefix: /api/v1.5
+database:
+  database_name: sdn_cloudstack
+  host: cloudstack.chalons.univ-reims.fr
+  password: iutchalons
+  port: 27017
+  username: root
+name: Foo
+snmp:
+  community: public
+  host: 10.59.10.64
+  port: 161

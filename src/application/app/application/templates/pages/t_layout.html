@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+    {% if title %}<title>SDN-Cloudstack - {{title}}</title>
+    {%else%}<title>SDN-Cloudstack</title>{%endif%}
+</head>
+<header>
+    <div class="header text-white flex h-28">
+        <div class="flex-shrink-0 flex-1 items-justify max-w-xs">
+            <p class="block px-3 py-3 text-2xl mt-6 leading-10 font-extrabold text-gray-700"><a href="/"
+                class="text-white hover:bg-gray-700 px-3 py-3 rounded-md text-2xl font-medium">SDN-Cloudstack</a></p>
+        </div>
+        <div class="flex-shrink-0 flex-1 items-justify max-w-xs">
+            <p class="block px-3 py-1 text-2xl mt-6 leading-10 font-extrabold text-gray-700">
+                <form class="felx flex-col"name="api_selecteur" action="" method="get">
+                    <select class="m-auto text-center header text-white flex flex-col text-xl font-medium" name="room">
+                        {%for room in api%}
+                            <option value="{{room}}">{{room}}</option>
+                        {%endfor%}
+                    </select>
+                    <button type="submit " class="m-auto header text-center text-white flex flex-col text-xl font-medium">Select</button>
+                </form></p>
+
+        </div>
+        <div class="flex-shrink-0 flex-1 items-center w-auto">
+            <p class="block px-3 py-3 text-center text-2xl mt-6 leading-10 text-white px-3 py-3 rounded-md text-2xl font-medium">{{title}}</a></p>
+        </div>
+        <div class="flex-1 items-justify max-w-xs">
+            <p class="block px-3 py-3 text-2xl mt-6 leading-10 font-extrabold text-gray-700"><a href="/login/"
+                class="text-white hover:bg-gray-700 px-3 py-3 rounded-md text-2xl font-medium">Login</a></p>
+        </div>
+    </div>
+</header>
+<body class="w-screen h-screen">
+    <div class="flex w-1\/5 h-full ">
+                <div class="navbar flex flex-col">
+                    <div>
+
+                        <div class="flex flex-col w-44 items-justify px-8 py-4">
+                            <a href="/resume/"
+                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
+                            <a href="/config-otg/"
+                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
+                            <a href="/config/"
+                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                        </div>
+                    </div>
+    </div>
+    <div class= "content w-full flex-col h-full">
+        {%block content%}{%endblock%}
+    </div>
+</body>
+</html>

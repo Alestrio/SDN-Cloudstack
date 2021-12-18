@@ -9,7 +9,8 @@ body{
     padding:0;
 }
 .navbar{
-    background-color: #252c31;
+    /*background-color: #252c31;*/
+    background-color: #87a3ff;
 }
 
 .fit-content {
@@ -20,5 +21,6 @@ body{
     background-color: #ffffff;
 }
 .header{
-    background-color: #1c90f3;
+    /*background-color: #1c90f3;*/
+    background-color: #585b66;
 }

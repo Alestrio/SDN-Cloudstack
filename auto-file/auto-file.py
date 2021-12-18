@@ -68,6 +68,6 @@ if __name__ == "__main__":
                   'name': 'Foo',
                   'domain_name': 'sdn.chalons.univ-reims.fr'}
 
-    dic = get_data()
-    create_config_file(**dic)
-    create_proxy_files(**dic)
+    # dic = get_data()
+    create_config_file(**config_dic)
+    create_proxy_files(**config_dic)
