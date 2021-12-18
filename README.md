@@ -1,5 +1,7 @@
 # SDN-API
 
+[![Docker Image CI](https://github.com/Alestrio/SDN-Cloudstack/actions/workflows/docker-image.yml/badge.svg)](https://github.com/Alestrio/SDN-Cloudstack/actions/workflows/docker-image.yml)
+
 An API meant to be used for Software Defined Network
 
 Documentation can be found on http://doc.sdn.chalons.univ-reims.fr
