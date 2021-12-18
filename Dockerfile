@@ -1,11 +1,16 @@
-FROM python:3.8
+FROM python:3.9-slim-buster
 
-WORKDIR /
+RUN apt update
+RUN apt install snmpd snmp libsnmp-dev -y
 
+WORKDIR /home/api
+
+copy ./requirements.txt /home/api/requirements.txt
 copy ./src/api /home/api/src/api
 copy ./config /home/api/src/api/config
 
-RUN pip install -r requirements.txt
+RUN pip install -r /home/api/requirements.txt
 
-ENTRYPOINT ["python","/home/api/src/api/api_run.py"]
-CMD ["no_config_specified"]
+ENV PYTHONPATH "${PYTHONPATH}:/home/api/src"
+
+CMD python3 ./src/api/api_run.py
