@@ -11,9 +11,6 @@ jobs:
     runs-on: sdn-api
     steps:
     - uses: actions/checkout@v2
-    - name: Pulls the repo
-      run: git pull
-      working-directory: /home/user/api_actions/sdn-cloudstack
     - name: Docker login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
