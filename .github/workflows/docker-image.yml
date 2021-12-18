@@ -11,6 +11,9 @@ jobs:
     runs-on: hugo_sdn_hugo
     steps:
     - uses: actions/checkout@v2
+    - name: Pulls the repo
+      run: git pull
+      working-directory: /home/user/api_actions
     - name: Docker login
       env:
         DOCKER_USER = ${{secrets.DOCKER_USER}}
