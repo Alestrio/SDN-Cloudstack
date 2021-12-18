@@ -13,4 +13,6 @@ RUN pip install -r /home/api/requirements.txt
 
 ENV PYTHONPATH "${PYTHONPATH}:/home/api/src"
 
+RUN touch /home/api/config/config.yaml
+
 CMD python3 ./src/api/api_run.py
