@@ -10,6 +10,6 @@ import yaml
 import os
 
 with open(os.path.join(os.path.dirname(__file__), 'config.yml'), 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
+    cfg = yaml.load(ymlfile, ymlfile)
 
 listening_address = cfg['listening_address']
