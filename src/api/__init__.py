@@ -9,7 +9,9 @@
 import yaml
 import os
 
-file = open('../../config/config.yaml')
+config_dir = os.getenv('CONFIG_DIR')
+
+file = open(f'{config_dir}/config.yaml')
 config = yaml.load(file, Loader=yaml.Loader)
 
 listening_address = config['listening_address']
