@@ -1,5 +1,90 @@
 {% extends 'pages/t_layout.html' %}
 {%block content%}
 {{super()}}
-Config on The go
+    <div class= "content flex h-full w-full">
+        <div class="border-2 w-1\/2 w-full flex h-full flex-col" >
+            <div class="h-full w-full"><textarea class=" resize-y h-full border-black border-2 w-full rounded-md" name="config"></textarea></div>
+            <div class="1\/6  h-full w-full items-center text-center m-auto"><button class="hover:bg-blue-100 px-2 py-2 rounded-md">Send-config</button></div>
+        </div>
+        <div class="border-2 w-1\/2 w-full">
+            <div class="flex flex-col w-full h-full">
+                <div class="h-2\/5 w-full h-full overflow-x-scroll">
+                    <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                        <thead>
+                            <tr>
+                                <th colspan="3"> Interface</th>
+                            </tr>
+                            <tr>
+                                <th class="border border-gray-400">Name</th>
+                                <th class="border border-gray-400">Native Vlan</th>
+                                <th class="border border-gray-400">Status</th>   
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for interface in interfaces%}
+                                <tr>
+                                    <th class="border border-gray-400 py-1">{{interface['name']}}</th>
+                                    <th class="border border-gray-400 py-1">{{interface['vlan']['description']}}</th>
+                                    <th class="border border-gray-400 py-1">{{interface['status']}}</th>
+                                </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="h-1\/5 w-full h-full overflow-x-scroll">
+                    <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                        <thead>
+                            <tr>
+                                <th colspan="2"> Vlan</th>
+                            </tr>
+                            <tr>
+                                <th class="border border-gray-400">Name</th>
+                                <th class="border border-gray-400">Vlan_ID</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for vlan in vlans%}
+                                <tr>
+                                    <th class="border border-gray-400">{{vlan['description']}}</th>
+                                    <th class="border border-gray-400">{{vlan['dot1q_id']}}</th>
+                                </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="h-2\/5 w-full h-full overflow-x-scroll">
+                    <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                        <thead>
+                            <tr>
+                                <th colspan="4"> Trunk</th>
+                            </tr>
+                            <tr>
+                                <th class="border border-gray-400">Interface</th>
+                                <th class="border border-gray-400">Vlan</th>
+                                <th class="border border-gray-400">Status</th>
+                                <th class="border border-gray-400">Tagged vlans</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {%for trunk in trunks%}
+                                <tr>
+                                    <th class="border border-gray-400">{{trunk['interface']['name']}}</th>
+                                    <th class="border border-gray-400">{{trunk['interface']['vlan']['description']}}</th>
+                                    <th class="border border-gray-400">{{trunk['interface']['status']}}</th>
+                                    <th class="border border-gray-400">
+                                        <ul>
+                                            {%for tagged in trunk['tagged_vlans']%}
+                                                <li>{{tagged['description']}}</li>
+                                            {%endfor%}
+                                        </ul>
+                                    </th>
+                                </tr>
+                            {%endfor%}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+    </div>
 {%endblock%}
