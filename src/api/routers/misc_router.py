@@ -5,13 +5,14 @@
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from src.api.auth_utils import get_current_admin_user
 from src.api.routers import ROUTE_PREFIX, operations
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Miscellaneous"],
-                   # dependencies=[Depends(get_current_user)],
+                   dependencies=[Depends(get_current_admin_user)],
                    responses={404: {"description": "Not found"}}
                    )
 

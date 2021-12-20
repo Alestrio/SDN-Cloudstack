@@ -7,6 +7,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from src.api.auth_utils import get_current_admin_user
 from src.api.models import VlanId
 from src.api.routers import operations, ROUTE_PREFIX
 
@@ -46,7 +47,7 @@ def get_interfaces_by_vlan(vlan_id: int):
 
 
 @router.post("/interfaces/{if_id}")
-def set_vlan_on_interface(if_id: int, body: VlanId):
+def set_vlan_on_interface(if_id: int, body: VlanId, user=Depends(get_current_admin_user)):
     # Set a vlan on an interface
     try:
         operations.set_interface_vlan(body.vlan_id, if_id)
