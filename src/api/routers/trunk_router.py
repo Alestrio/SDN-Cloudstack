@@ -7,6 +7,7 @@
 
 from fastapi import APIRouter, Depends, HTTPException
 
+from src.api.auth_utils import get_current_admin_user
 from src.api.models import Trunk
 from src.api.routers import operations, ROUTE_PREFIX
 
@@ -69,7 +70,7 @@ def get_trunk_by_dot1q_id(dot1q_id: str):
 
 
 @router.post("/trunks/create")
-def create_trunk(trunk: Trunk):
+def create_trunk(trunk: Trunk, user=Depends(get_current_admin_user)):
     """
     Create a trunk
     """
@@ -80,7 +81,7 @@ def create_trunk(trunk: Trunk):
 
 
 @router.post("/trunks/{tr_id}/tagged_vlan/{vlan_id}")
-def tagged_vlan(tr_id: str, vlan_id: str):
+def tagged_vlan(tr_id: str, vlan_id: str, user=Depends(get_current_admin_user)):
     """
     Add a tagged vlan to a trunk
     """
@@ -91,7 +92,7 @@ def tagged_vlan(tr_id: str, vlan_id: str):
 
 
 @router.put("/trunks/{tr_id}/native_vlan/{vlan_id}")
-def native_vlan(tr_id: str, vlan_id: str):
+def native_vlan(tr_id: str, vlan_id: str, user=Depends(get_current_admin_user)):
     """
     Set the native vlan of a trunk
     """
