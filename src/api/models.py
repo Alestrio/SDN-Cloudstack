@@ -4,8 +4,6 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-
-
 from pydantic import BaseModel
 from pydantic.typing import Optional, Union, List
 
@@ -88,3 +86,49 @@ class TrunkBrief(BaseModel):
     interface_id: int
     native_vlan: Union[Vlan, None]
     tagged_vlans: str
+
+
+class User(BaseModel):
+    """
+    That class defines the user model
+    """
+    id: str
+    username: str
+    hashed_password: str
+    email: str
+    is_admin: bool
+    is_active: bool
+
+    @staticmethod
+    def from_db_item(item: dict):
+        """
+        This method returns a User object from a DB item
+        """
+        return User(
+            id=str(item['_id']),
+            username=item['username'],
+            hashed_password=item['hashed_password'],
+            email=item['email'],
+            is_admin=item['is_admin'],
+            is_active=item['is_active']
+        )
+
+
+class UserIn(User):
+    """
+    That class defines the user model for POST request
+    """
+    password: str
+    id: Optional[int]
+    hashed_password: Optional[str]
+    is_admin = False
+    is_active = True
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    username: Optional[str] = None
