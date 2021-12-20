@@ -9,6 +9,7 @@ WORKDIR /home/api
 copy ./requirements.txt /home/api/requirements.txt
 copy ./src/api /home/api/src/api
 copy ./config /home/api/config
+copy ./mibs /usr/share/snmp/mibs
 
 RUN pip install -r /home/api/requirements.txt
 

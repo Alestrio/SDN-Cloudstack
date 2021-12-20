@@ -9,7 +9,9 @@
 import yaml
 import os
 
-with open(os.path.join(os.path.dirname(__file__), 'config.yml'), 'r') as ymlfile:
-    cfg = yaml.load(ymlfile)
+config_dir = os.getenv('CONFIG_DIR')
 
-listening_address = cfg['listening_address']
+file = open(f'{config_dir}/config.yaml')
+config = yaml.load(file, Loader=yaml.Loader)
+
+listening_address = config['listening_address']
