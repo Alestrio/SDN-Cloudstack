@@ -3,8 +3,6 @@ name: Docker Image CI
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
   build:
@@ -21,8 +19,8 @@ jobs:
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
       working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
     - name: Build the Docker image
-      run: docker image build . --file Dockerfile --tag alestrio/sdn-cloudstack:latest
+      run: docker image build . --file Dockerfile --tag europe-west1-docker.pkg.dev/sdn-cloudstack/alestrio/sdn-cloudstack:latest
       working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
     - name: Docker push
-      run: docker image push ${{secrets.DOCKER_USER}}/sdn-cloudstack:latest
+      run: docker image push europe-west1-docker.pkg.dev/sdn-cloudstack/alestrio/sdn-cloudstack:latest
       working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
