@@ -8,7 +8,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.auth_utils import get_current_admin_user
-from src.api.models import Trunk
+from src.api.models import Trunk, TrunkIn
 from src.api.routers import operations, ROUTE_PREFIX
 
 router = APIRouter(prefix=ROUTE_PREFIX,
@@ -70,14 +70,14 @@ def get_trunk_by_dot1q_id(dot1q_id: str):
 
 
 @router.post("/trunks/create")
-def create_trunk(trunk: Trunk, user=Depends(get_current_admin_user)):
+def create_trunk(trunk: TrunkIn, user=Depends(get_current_admin_user)):
     """
     Create a trunk
     """
-    try:
-        return operations.create_trunk(trunk)
-    except Exception as e:
-        raise HTTPException(status_code=404, detail=str(e))
+    #try:
+    return operations.create_trunk(trunk.interface_id, trunk.native_vlan, trunk.tagged_vlans)
+    #except Exception as e:
+    #    raise HTTPException(status_code=404, detail=str(e))
 
 
 @router.post("/trunks/{tr_id}/tagged_vlan/{vlan_id}")

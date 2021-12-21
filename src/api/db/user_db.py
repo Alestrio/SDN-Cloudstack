@@ -19,7 +19,10 @@ class UserDB(Database):
         :param user_id: user id
         :return: user
         """
-        return self.user_collection.find_one({"_id": user_id})
+        db_item = self.user_collection.find_one({"_id": user_id})
+        if db_item is None:
+            return None
+        return User.from_db_item(db_item)
 
     def get_user_by_username(self, username):
         """
@@ -27,7 +30,10 @@ class UserDB(Database):
         :param username: username
         :return: user
         """
-        return User.from_db_item(self.user_collection.find_one({"username": username}))
+        db_item = self.user_collection.find_one({"username": username})
+        if db_item is None:
+            return None
+        return User.from_db_item(db_item)
 
     def get_user_by_email(self, username):
         """
@@ -35,7 +41,10 @@ class UserDB(Database):
         :param username: email
         :return: user
         """
-        return User.from_db_item(self.user_collection.find_one({"email": username}))
+        db_item = self.user_collection.find_one({"email": username})
+        if db_item is None:
+            return None
+        return User.from_db_item(db_item)
 
     def add_user(self, user):
         """

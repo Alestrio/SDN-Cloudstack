@@ -6,8 +6,10 @@
 #  reproduction forbidden except with authorization from the authors.
 
 from fastapi import APIRouter, HTTPException, Depends
+from fastapi.responses import PlainTextResponse
 
 from src.api.auth_utils import get_current_admin_user
+from src.api.data.cli_configurator import Cli_configurator
 from src.api.models import Config
 from src.api.routers import ROUTE_PREFIX, db, operations
 
@@ -46,6 +48,17 @@ def get_running_config():
     try:
         config = operations.get_running_config()
         return config
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting running configuration')
+
+
+@router.get("/configs/running_cisco", response_class=PlainTextResponse)
+def get_running_config_cisco():
+    # Return the running config from the switch
+    try:
+        config = operations.get_running_config()
+        configurator = Cli_configurator(config)
+        return configurator.get_config()
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while getting running configuration')
 
