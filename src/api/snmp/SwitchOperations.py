@@ -171,7 +171,8 @@ class SwitchOperations:
             # we need to compress the byte-string to get the vlans
             if tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])) and \
                     str(tagged_vlans.get(
-                        self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i]))) != '0x7' + 'f' * 255:
+                        self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i]))) != '0x7' + 'f' * 255 and \
+                    statuses[i] == '1':
                 tg_vls = str(tagged_vlans.get(self.config['trunks']['oids']['vlans'] + '.' + str(indexes[i])))[2:]
                 vlan_iterator = 0
                 for hex_symbol in tg_vls:
