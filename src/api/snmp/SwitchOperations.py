@@ -227,7 +227,7 @@ class SwitchOperations:
         """adds tagged vlan to trunk"""
         # build the binary string
         bit_string = ''
-        for i in range(255 * 4):
+        for i in range(256 * 4):
             if i == int(tagged_vlan):
                 bit_string += '1'
             else:
@@ -241,31 +241,41 @@ class SwitchOperations:
         octet_string = '0x' + format(int(bit_string, 2), '02x')
         # set the tagged vlan
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans'] + '.' + str(interface_id),
-                          value=octet_string, community=self.community, value_type='OCTETSTR')
+                          value=octet_string, community=self.community, value_type='x')
+
+    def set_tagged_vlan_2k_4k_0(self, interface_id):
+        octet_string = '0x' + '0'*256
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans2k'] + '.' + str(interface_id),
+                          value=octet_string, community=self.community, value_type='x')
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans3k'] + '.' + str(interface_id),
+                          value=octet_string, community=self.community, value_type='x')
+        snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['vlans4k'] + '.' + str(interface_id),
+                          value=octet_string, community=self.community, value_type='x')
 
     def set_trunk_native_vlan(self, interface_id, native_vlan):
         """sets trunk native vlan"""
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['trunks']['oids']['native'] + '.' + str(interface_id),
-                          value=native_vlan, community=self.community, value_type='INTEGER')
+                          value=str(native_vlan), community=self.community, value_type='i')
 
     def create_trunk(self, interface_id, native_vlan, tagged_vlans):
         """creates trunk"""
         # set interface mode to trunk
         snmp_cmds.snmpset(ipaddress=self.ip, oid=self.config['interfaces']['oids']['sets']['trunk_mode'] +
                           '.' + str(interface_id),
-                          value='1', community=self.community, value_type='INTEGER')
+                          value='1', community=self.community, value_type='i')   # Set as trunk on (2 = off)
         # set native vlan
         self.set_trunk_native_vlan(interface_id, native_vlan)
         # set tagged vlans
         for vlan in tagged_vlans:
-            self.add_tagged_vlan(interface_id, vlan.dot1q_id)
+            self.add_tagged_vlan(interface_id, vlan)
+        self.set_tagged_vlan_2k_4k_0(interface_id)
 
     def set_interface_vlan(self, dot1q_id, interface_id):
         """Set the vlan of an interface"""
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
                           oid=self.config['interfaces']['oids']['sets']['vlan'] + '.' + str(interface_id),
                           value=str(dot1q_id),
-                          value_type='i')
+                          value_type='x')
         self.rebuild_cache_background()
 
     def get_interface_by_id(self, interface_id):

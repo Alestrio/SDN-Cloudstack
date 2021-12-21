@@ -132,3 +132,12 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     username: Optional[str] = None
+
+
+class TrunkIn(BaseModel):
+    """
+    That class defines the trunk model for POST request
+    """
+    interface_id: int
+    native_vlan: Optional[int]
+    tagged_vlans: Optional[List[int]]
