@@ -7,7 +7,8 @@
 
 from fastapi import APIRouter, HTTPException
 
-from src.api.routers import ROUTE_PREFIX, operations
+from src.api.routers import ROUTE_PREFIX
+from src.api.routers import vlan_operations as operations
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["VLANs"],

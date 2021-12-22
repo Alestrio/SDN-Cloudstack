@@ -11,7 +11,8 @@ from fastapi.responses import PlainTextResponse
 from src.api.auth_utils import get_current_admin_user
 from src.api.data.cli_configurator import Cli_configurator
 from src.api.models import Config
-from src.api.routers import ROUTE_PREFIX, db, operations
+from src.api.routers import ROUTE_PREFIX, db
+from src.api.routers import config_operations as operations
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Config"],
