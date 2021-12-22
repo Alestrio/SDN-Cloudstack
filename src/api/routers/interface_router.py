@@ -9,7 +9,9 @@ from fastapi import APIRouter, Depends, HTTPException
 
 from src.api.auth_utils import get_current_admin_user
 from src.api.models import VlanId
-from src.api.routers import operations, ROUTE_PREFIX
+from src.api.routers import ROUTE_PREFIX
+from src.api.routers import interface_operations as operations
+
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Interfaces"],
