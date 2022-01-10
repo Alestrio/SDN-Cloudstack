@@ -23,7 +23,13 @@
                         </thead>
                         <tbody>
                             {%for interface in interfaces%}
-
+                                {% for val in interface %}
+                                     {% if val is none %}
+                                         null,
+                                     {% else %}
+                                         {{ val }},
+                                     {% endif %}
+                                {% endfor %}
                                 <tr>
                                     <th class="border border-gray-400"><button ondblclick="setConfig_input(({{interface}}))">{{interface['name']}}</button></th>
                                     <th class="border border-gray-400">{{interface['vlan']['description']}}</th>
@@ -51,7 +57,7 @@
                         <tbody>
                             {%for vlan in vlans%}
                                 <tr>
-                                    <th class="border border-gray-400">{{vlan['description']}}</th>
+                                    <th class="border border-gray-400"><button ondblclick="setConfig_input(({{vlan}}))">{{vlan['description']}}</button></th>
                                     <th class="border border-gray-400">{{vlan['dot1q_id']}}</th>
                                 </tr>
                             {%endfor%}
@@ -74,7 +80,7 @@
                         <tbody>
                             {%for trunk in trunks%}
                                 <tr>
-                                    <th class="border border-gray-400">{{trunk['interface']['name']}}</th>
+                                    <th class="border border-gray-400"><button ondblclick="setConfig_input(({{trunk}}))">{{trunk['interface']['name']}}</button></th>
                                     <th class="border border-gray-400">{{trunk['interface']['vlan']['description']}}</th>
                                     {%if trunk['interface']['status'] == 'up'%}
                                     <th class="border border-gray-400 bg-green-200">{{trunk['interface']['status']}}</th>
@@ -108,7 +114,7 @@
     </script>
     <script>
         function setConfig_input(config) {
-            var conf_interface = JSON.stringify(config)
+            var conf_interface = JSON.stringify(config, null, '\t');
             document.getElementById("config_input").value = conf_interface;
         }
         </script>
