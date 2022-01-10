@@ -73,5 +73,5 @@ def get_vlans(api_link):
 
 def get_interfaces(api_link):
     content = urllib.request.urlopen(f"{api_link}interfaces")
-    content = json.load(content)
+    content = json.load(content, )
     return content
