@@ -11,7 +11,7 @@ import urllib
 import json
 
 api=['Reseau-1','Reseau-2','Reseau-3']
-api_link = "http://10.59.50.233:8064/api/v1.5/"
+api_link = "http://r1.api.sdn.chalons.univ-reims.fr/api/v1.5/"
 
 
 # Route

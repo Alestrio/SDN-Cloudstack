@@ -36,22 +36,26 @@
         </div>
     </div>
 </header>
-<body class="w-screen h-screen">
-    <div class="flex w-1\/5 h-full fixed ">
-                <div class="navbar flex flex-col">
-                    <div>
+<body class=" flex-col w-screen h-screen fixed">
+    <div class="flex w-full h-full">
+        <div class="flex w-1\/5 h-full flex-none overflow-y-none ">
+                    <div class="navbar flex flex-col">
+                        <div>
 
-                        <div class="flex flex-col w-44 items-justify px-8 py-4">
-                            <a href="/resume/"
-                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
-                            <a href="/config-otg/"
-                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
-                            <a href="/config/"
-                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                            <div class="flex flex-col w-44 items-justify px-8 py-4">
+                                <a href="/resume/"
+                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
+                                <a href="/config-otg/"
+                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
+                                <a href="/config/"
+                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                            </div>
                         </div>
-                    </div>
+        </div>
+        </div>
+        <div class="flex w-full w-4\/5 h-full">
+            {%block content%}{%endblock%}
+        </div>
     </div>
-        {%block content%}{%endblock%}
-
 </body>
 </html>
