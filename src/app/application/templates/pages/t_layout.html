@@ -9,53 +9,46 @@
     {% if title %}<title>SDN-Cloudstack - {{title}}</title>
     {%else%}<title>SDN-Cloudstack</title>{%endif%}
 </head>
-<header>
-    <div class="header text-white flex h-28">
-        <div class="flex-shrink-0 flex-1 items-justify max-w-xs">
-            <p class="block px-3 py-3 text-2xl mt-6 leading-10 font-extrabold text-gray-700"><a href="/"
-                class="text-white hover:bg-gray-700 px-3 py-3 rounded-md text-2xl font-medium">SDN-Cloudstack</a></p>
+<body class="flex-col w-screen h-screen overflow-hidden">
+    <header class=" header flex w-full h-1/6  items-center text-2xl font-extrabold text-white space-x-5">
+        <div>
+            <button class="px-5 grow"><a href="/">SDN-Cloudstack</a></button>
         </div>
-        <div class="flex-shrink-0 flex-1 items-justify max-w-xs">
-            <p class="block px-3 py-1 text-2xl mt-6 leading-10 font-extrabold text-gray-700">
-                <form class="felx flex-col"name="api_selecteur" action="" method="get">
-                    <select class="m-auto text-center header text-white flex flex-col text-xl font-medium" name="room">
-                        {%for room in api%}
-                            <option value="{{room}}">{{room}}</option>
-                        {%endfor%}
-                    </select>
-                    <button type="submit " class="m-auto header text-center text-white flex flex-col text-xl font-medium">Select</button>
-                </form></p>
-
+        <div>
+            <select class="header text-white" onchange="if (this.value) window.location.href=this.value" >
+                {%for room in api%}s
+                <option value="/config-otg/{{room}}">{{room}}</option>
+                {%endfor%}
+            </select>
         </div>
-        <div class="flex-shrink-0 flex-1 items-center w-auto">
-            <p class="block px-3 py-3 text-center text-2xl mt-6 leading-10 text-white px-3 py-3 rounded-md text-2xl font-medium">{{title}}</a></p>
+        <div class="flex-auto text-center">
+            <p>{{title}}</p>
         </div>
-        <div class="flex-1 items-justify max-w-xs">
-            <p class="block px-3 py-3 text-2xl mt-6 leading-10 font-extrabold text-gray-700"><a href="/login/"
-                class="text-white hover:bg-gray-700 px-3 py-3 rounded-md text-2xl font-medium">Login</a></p>
+        <div>
+            <button class="px-5"><a href="t_login.html">Login</a></button>
         </div>
-    </div>
-</header>
-<body class=" flex-col w-screen h-screen fixed">
-    <div class="flex w-full h-full">
-        <div class="flex w-1\/5 h-full flex-none overflow-y-none ">
-                    <div class="navbar flex flex-col">
-                        <div>
-
-                            <div class="flex flex-col w-44 items-justify px-8 py-4">
-                                <a href="/resume/"
-                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
-                                <a href="/config-otg/"
-                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
-                                <a href="/config/"
-                                class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+    </header>
+    <main class=" w-full h-5/6">
+        <div class="flex w-full h-full">
+            <div class="flex w-1\/5 h-full flex-none overflow-y-none ">
+                        <div class="navbar flex flex-col">
+                            <div>
+    
+                                <div class="flex flex-col w-44 items-justify px-8 py-4">
+                                    <a href="/resume/"
+                                    class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
+                                    <a href="/config-otg/"
+                                    class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
+                                    <a href="/config/"
+                                    class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                                </div>
                             </div>
-                        </div>
+            </div>
+            </div>
+            <div class="flex w-full w-4\/5 h-full">
+                {%block content%}{%endblock%}
+            </div>
         </div>
-        </div>
-        <div class="flex w-full w-4\/5 h-full">
-            {%block content%}{%endblock%}
-        </div>
-    </div>
+    </main>
+    {%block script%}{%endblock%}
 </body>
-</html>
