@@ -47,7 +47,7 @@ class InterfaceOperations(AbstractOperations):
                 name=interface['ifDescr'],
                 port_id=interface['ifIndex'],
                 description=interface['ifDescr'],
-                status=interface['ifOperStatus'],
+                status=interface['ifAdminStatus'],
                 operstatus=interface['ifOperStatus'],
                 speed=interface['ifSpeed'],
             ))
@@ -86,13 +86,13 @@ class InterfaceOperations(AbstractOperations):
         return Interface(
             vlan=Vlan(
                 dot1q_id=if_vlan,
-                name=vlan_name
+                description=vlan_name
             ),
             name=if_name,
             port_id=if_port_id,
             description=if_name,
-            status=if_status,
-            operstatus=if_operstatus,
+            status=('up' if if_status == 1 else 'down'),
+            operstatus=('up' if if_operstatus == 1 else 'down'),
             speed=if_speed,
         )
 
@@ -104,4 +104,29 @@ class InterfaceOperations(AbstractOperations):
                 if interface.vlan.dot1q_id == vlan_id:
                     interfaces.append(interface)
         return interfaces
+
+    def set_interface_state(self, interface_id, state: bool):
+        """Set the state of an interface"""
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['interfaces']['oids']['status'] + '.' + str(interface_id),
+                          value=('2' if state else '1'),
+                          value_type='i')
+        self.rebuild_cache_background()
+
+    def set_interface_trunk(self, interface_id, state: bool):
+        """Set the trunk state of an interface"""
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['interfaces']['oids']['trunk'] + '.' + str(interface_id),
+                          value=('0' if state else '1'),
+                          value_type='i')
+        self.rebuild_cache_background()
+
+    def set_interface_description(self, interface_id, description):
+        """Set the description of an interface"""
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['interfaces']['oids']['description'] + '.' + str(interface_id),
+                          value=description,
+                          value_type='x')
+        self.rebuild_cache_background()
+
 

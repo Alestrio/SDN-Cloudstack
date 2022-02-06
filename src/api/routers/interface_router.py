@@ -29,11 +29,11 @@ def get_interfaces():
 @router.get("/interfaces/{if_id}")
 def get_if_id(if_id: int):
     # Return an interface by its id
-    try:
-        interface = operations.get_interface_by_id(if_id)
-        return interface
-    except Exception as e:
-        raise HTTPException(status_code=404, detail="Interface not found")
+    #try:
+    interface = operations.get_interface_by_id(if_id)
+    return interface
+    #except Exception as e:
+    #    raise HTTPException(status_code=404, detail="Interface not found" + str(e))
 
 
 @router.get("/interfaces/by_vlan/{vlan_id}")
@@ -48,12 +48,34 @@ def get_interfaces_by_vlan(vlan_id: int):
         raise HTTPException(status_code=404, detail="Interfaces not found")
 
 
-@router.post("/interfaces/{if_id}")
-def set_vlan_on_interface(if_id: int, body: VlanId, user=Depends(get_current_admin_user)):
+@router.post("/interfaces/{if_id}/vlan/{vlan_id}")
+def set_vlan_on_interface(if_id: int, vlan_id: int, user=Depends(get_current_admin_user)):
     # Set a vlan on an interface
     try:
-        operations.set_interface_vlan(body.vlan_id, if_id)
+        operations.set_interface_vlan(vlan_id, if_id)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Interface or Vlan not found")
 
     return {"message": "Vlan set on interface"}
+
+
+# Route to set up or down an interface
+@router.post('/interface/{if_id}/state/{state}')
+def set_interface_state(if_id: int, state: str, user=Depends(get_current_admin_user)):
+    try:
+        operations.set_interface_state(if_id, state)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Interface not found" + str(e))
+
+    return {"message": "Interface state set"}
+
+
+@router.post('/interface/{if_id}/description')
+def set_interface_description(if_id: int, body: str, user=Depends(get_current_admin_user)):
+    try:
+        operations.set_interface_description(if_id, body)
+    except Exception as e:
+        raise HTTPException(status_code=404, detail="Interface not found")
+
+    return {"message": "Interface description set"}
+
