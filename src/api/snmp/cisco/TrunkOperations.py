@@ -46,6 +46,7 @@ class TrunkOperations(AbstractOperations):
         tagged_vlans = utils.bulk(self.config['trunks']['oids']['vlans'])
         native_vlan = list(utils.bulk(self.config['trunks']['oids']['native']).values())
         statuses = list(utils.bulk(self.config['trunks']['oids']['status']).values())
+        encapsulations = list(utils.bulk(self.config['trunks']['oids']['encapsulation']).values())
         for i in range(len(indexes)):
             interface = None
             for j in interfaces:
@@ -81,7 +82,7 @@ class TrunkOperations(AbstractOperations):
                 native_vlan=tr_native_vlan,
                 tagged_vlans=tr_tagged_vlans,
                 status=statuses[i]
-            ))
+            )) if encapsulations[i] == '4' else None
 
         return trunks
 
