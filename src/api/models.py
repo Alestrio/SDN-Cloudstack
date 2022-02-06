@@ -51,7 +51,7 @@ class Trunk(BaseModel):
     That class defines a trunk as it is described in JSONs sent and received by the API
     """
     interface: Union[Interface, int]
-    native_vlan: Union[Vlan, None]
+    native_vlan: Optional[Union[Vlan, int]]
     tagged_vlans: list[Union[Vlan, int]]
     status: str
 
@@ -60,10 +60,12 @@ class Trunk(BaseModel):
         This method returns a string of octets representing the tagged VLANs
         """
         bit_string = ''
-        for i in range(255 * 4):
-            for vl in self.tagged_vlans:
-                if vl.dot1q_id == i:
-                    bit_string += '1'
+        for i in range(128 * 4):
+            vlans_ids = [vlan.dot1q_id for vlan in self.tagged_vlans if isinstance(vlan, Vlan)]
+            if i in self.tagged_vlans:
+                bit_string += '1'
+            elif i in vlans_ids:
+                bit_string += '1'
             else:
                 bit_string += '0'
         return bit_string
@@ -73,6 +75,7 @@ class Config(BaseModel):
     """
     That class defines the JSON model for add_config POST request
     """
+    name: str
     hostname: Optional[str]
     interfaces: list[Interface]
     vlans: list[Vlan]

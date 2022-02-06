@@ -84,3 +84,14 @@ def delete_config(config_id: str):
         raise HTTPException(status_code=500, detail='Server error while deleting configuration')
 
     return {'message': 'Configuration deleted'}
+
+
+@router.get("/configs/brief")
+def get_brief_configs():
+    # Return all the configs from the mongoDB database
+    try:
+        configs = db.get_brief_configs()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting configurations')
+
+    return {'configs': configs}

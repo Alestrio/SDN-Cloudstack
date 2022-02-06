@@ -52,3 +52,14 @@ class Database:
         :param config_id: Id of the config
         """
         self.configs_collections.delete_one({'_id': config_id})
+
+    def get_brief_configs(self):
+        """
+        Get the configs stored in database
+        :return: List of configs
+        """
+        configs_names = []
+        for config in self.configs_collections.find({}):
+            config['_id'] = str(config['_id']).replace('ObjectId(', '').replace(')', '')
+            configs_names.append(config['name'])
+        return configs_names

@@ -71,13 +71,13 @@ def get_trunk_by_dot1q_id(dot1q_id: str):
         raise HTTPException(status_code=404, detail=str(e))
 
 
-@router.post("/trunks/create")
-def create_trunk(trunk: TrunkIn, user=Depends(get_current_admin_user)):
+@router.post("/trunks/set")
+def set_trunk(trunk: TrunkIn):
     """
-    Create a trunk
+    Set a trunk
     """
     #try:
-    return operations.create_trunk(trunk.interface_id, trunk.native_vlan, trunk.tagged_vlans)
+    return operations.set_trunk(trunk.interface_id, trunk.tagged_vlans, trunk.native_vlan)
     #except Exception as e:
     #    raise HTTPException(status_code=404, detail=str(e))
 
