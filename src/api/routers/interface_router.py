@@ -61,7 +61,7 @@ def set_vlan_on_interface(if_id: int, vlan_id: int, user=Depends(get_current_adm
 
 # Route to set up or down an interface
 @router.post('/interface/{if_id}/state/{state}')
-def set_interface_state(if_id: int, state: str, user=Depends(get_current_admin_user)):
+def set_interface_state(if_id: int, state: bool, user=Depends(get_current_admin_user)):
     try:
         operations.set_interface_state(if_id, state)
     except Exception as e:
