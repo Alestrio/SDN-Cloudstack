@@ -12,7 +12,7 @@ from starlette import status
 
 from src.api import auth_utils
 from src.api.auth_utils import authenticate_user, ACCESS_TOKEN_EXPIRE_MINUTES, create_access_token, \
-    get_current_active_user
+    get_current_active_user, get_current_admin_user
 from src.api.db.user_db import UserDB
 from src.api.models import Token, User, UserIn
 from src.api.routers import ROUTE_PREFIX, config
@@ -48,4 +48,17 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 @router.post("/users/register/")
 async def create_user(form_data: UserIn):
     user = auth_utils.create_user(form_data)
+    user.admin = False
     return user
+
+
+@router.put("/users/{user_id}/admin/{admin}")
+async def change_admin_status(user_id: int, admin: bool, current_user: User = Depends(get_current_admin_user)):
+    user = UserDB.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    if user.admin != admin:
+        user.admin = admin
+        UserDB.update_user(user)
+    return user
+

@@ -53,3 +53,11 @@ class UserDB(Database):
         :return: user
         """
         return self.user_collection.insert_one(user.dict())
+
+    def update_user(self, user):
+        """
+        Update user
+        :param user: user
+        :return: user
+        """
+        return self.user_collection.update_one({"_id": user.id}, {"$set": user.dict()})
