@@ -91,11 +91,20 @@ class TrunkBrief(BaseModel):
     tagged_vlans: str
 
 
+class UserIn(BaseModel):
+    """
+    That class defines the user model for POST request
+    """
+    username: str
+    email: str
+    password: str
+
+
 class User(BaseModel):
     """
     That class defines the user model
     """
-    id: str
+    id: Optional[str]
     username: str
     hashed_password: str
     email: str
@@ -116,16 +125,18 @@ class User(BaseModel):
             is_active=item['is_active']
         )
 
-
-class UserIn(User):
-    """
-    That class defines the user model for POST request
-    """
-    password: str
-    id: Optional[int]
-    hashed_password: Optional[str]
-    is_admin = False
-    is_active = True
+    @staticmethod
+    def from_userin(userin: UserIn):
+        """
+        This method returns a User object from a UserIn object
+        """
+        return User(
+            username=userin.username,
+            hashed_password=userin.password,
+            email=userin.email,
+            is_admin=False,
+            is_active=True
+        )
 
 
 class Token(BaseModel):

@@ -117,5 +117,7 @@ def create_user(user: UserIn):
     """
     Create a user
     """
-    user.hashed_password = get_password_hash(user.password)
+    password = user.password
+    user = User.from_userin(user)
+    user.hashed_password = get_password_hash(password)
     db.add_user(user)

@@ -48,7 +48,6 @@ async def read_users_me(current_user: User = Depends(get_current_active_user)):
 @router.post("/users/register/")
 async def create_user(form_data: UserIn):
     user = auth_utils.create_user(form_data)
-    user.admin = False
     return user
 
 
