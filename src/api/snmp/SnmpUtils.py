@@ -75,7 +75,7 @@ class SnmpUtils:
         self.community = community
 
     def findById(self, oid, id):
-        item = self.walk(oid + "." + str(id-1), 1)  # I dunno why, but you need -1 here..
+        item = self.walk(oid + "." + str(int(id)-1), 1)  # I dunno why, but you need -1 here..
         if str(id) == list(item.keys())[-1].split('.')[-1]:
             return list(item.values())[-1]
         else:

@@ -30,7 +30,7 @@ class Interface(BaseModel):
     name: str
     description: str
     port_id: int
-    status: Optional[str]
+    status: Optional[Union[str, int]]
     operstatus: Union[str, int]  # Can be provided as int for config creation
     vlan: Optional[Union[Vlan, int, None]]
     speed: Optional[int]
@@ -51,7 +51,7 @@ class Trunk(BaseModel):
     That class defines a trunk as it is described in JSONs sent and received by the API
     """
     interface: Union[Interface, int]
-    native_vlan: Union[Vlan, None]
+    native_vlan: Optional[Union[Vlan, int]]
     tagged_vlans: list[Union[Vlan, int]]
     status: str
 
@@ -60,10 +60,12 @@ class Trunk(BaseModel):
         This method returns a string of octets representing the tagged VLANs
         """
         bit_string = ''
-        for i in range(255 * 4):
-            for vl in self.tagged_vlans:
-                if vl.dot1q_id == i:
-                    bit_string += '1'
+        for i in range(128 * 4):
+            vlans_ids = [vlan.dot1q_id for vlan in self.tagged_vlans if isinstance(vlan, Vlan)]
+            if i in self.tagged_vlans:
+                bit_string += '1'
+            elif i in vlans_ids:
+                bit_string += '1'
             else:
                 bit_string += '0'
         return bit_string
@@ -73,6 +75,7 @@ class Config(BaseModel):
     """
     That class defines the JSON model for add_config POST request
     """
+    name: str
     hostname: Optional[str]
     interfaces: list[Interface]
     vlans: list[Vlan]
@@ -88,11 +91,20 @@ class TrunkBrief(BaseModel):
     tagged_vlans: str
 
 
+class UserIn(BaseModel):
+    """
+    That class defines the user model for POST request
+    """
+    username: str
+    email: str
+    password: str
+
+
 class User(BaseModel):
     """
     That class defines the user model
     """
-    id: str
+    id: Optional[str]
     username: str
     hashed_password: str
     email: str
@@ -113,16 +125,18 @@ class User(BaseModel):
             is_active=item['is_active']
         )
 
-
-class UserIn(User):
-    """
-    That class defines the user model for POST request
-    """
-    password: str
-    id: Optional[int]
-    hashed_password: Optional[str]
-    is_admin = False
-    is_active = True
+    @staticmethod
+    def from_userin(userin: UserIn):
+        """
+        This method returns a User object from a UserIn object
+        """
+        return User(
+            username=userin.username,
+            hashed_password=userin.password,
+            email=userin.email,
+            is_admin=False,
+            is_active=True
+        )
 
 
 class Token(BaseModel):

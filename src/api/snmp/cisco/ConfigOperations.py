@@ -34,17 +34,21 @@ class ConfigOperations(AbstractOperations):
         :param config: the config to translate
         """
         vlans = self.vlan_operations.get_vlannames_and_ids()
-        for interface in config.interfaces:
-            self.interface_operations.set_interface_vlan(interface.vlan.dot1q_id, interface.port_id)
         for vlan in config.vlans:
             if vlan not in vlans:
                 self.vlan_operations.add_vlan(vlan)
+        for interface in config.interfaces:
+            self.interface_operations.set_interface_vlan(interface.vlan.dot1q_id, interface.port_id)
+        for trunk in config.trunks:
+            self.trunk_operations.set_trunk(trunk.vlan.dot1q_id, trunk.port_id)
+        self.misc_operations.set_hostname(config.hostname)
         # rebuild the cache
         self.rebuild_cache_background()
         return
 
     def get_running_config(self):
         """Return the running config of the switch"""
+        name = "running-config"
         hostname = self.misc_operations.get_hostname()
         vlans = self.vlan_operations.get_vlannames_and_ids()
         interfaces = self.interface_operations.get_interfaces()
