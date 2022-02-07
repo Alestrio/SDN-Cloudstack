@@ -24,6 +24,16 @@ router = APIRouter(prefix=ROUTE_PREFIX,
                    )
 
 
+@router.get('/users/')
+async def get_users(current_user: User = Depends(get_current_admin_user)):
+    users = auth_utils.get_all_users()
+    json_users = []
+    for user in users:
+        json_users.append(User.from_db_item(user))
+
+    return json_users
+
+
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
@@ -53,11 +63,19 @@ async def create_user(form_data: UserIn):
 
 @router.put("/users/{user_id}/admin/{admin}")
 async def change_admin_status(user_id: int, admin: bool, current_user: User = Depends(get_current_admin_user)):
-    user = UserDB.get_user_by_id(user_id)
+    user = auth_utils.get_user_by_id(user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if user.admin != admin:
         user.admin = admin
-        UserDB.update_user(user)
+        auth_utils.update_user(user)
     return user
 
+
+@router.delete('/users/{username}')
+async def delete_user(username: str, current_user: User = Depends(get_current_admin_user)):
+    user = auth_utils.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    auth_utils.delete_user(user)
+    return user

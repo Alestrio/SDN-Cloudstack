@@ -121,3 +121,45 @@ def create_user(user: UserIn):
     user = User.from_userin(user)
     user.hashed_password = get_password_hash(password)
     db.add_user(user)
+
+
+def get_user_by_id(user_id):
+    """
+    Get a user by its id
+    """
+    user = db.get_user_by_id(user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+def update_user(user):
+    """
+    Update a user
+    """
+    db.update_user(user)
+
+
+def get_all_users():
+    """
+    Get all users
+    """
+    users = db.get_all_users()
+    return users
+
+
+def get_user_by_username(username):
+    """
+    Get a user by its username
+    """
+    user = db.get_user_by_username(username)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
+
+
+def delete_user(user):
+    """
+    Delete a user
+    """
+    db.delete_user(user)
