@@ -19,7 +19,7 @@ jobs:
       working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
     - name: Docker stop
       run: docker-compose down
-      working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
+      working-directory: /home/user/compose/compose
     - name: Docker reup
       run: docker-compose up -d
-      working-directory: /home/user/SDN-Cloudstack/SDN-Cloudstack
+      working-directory: /home/user/compose/compose
