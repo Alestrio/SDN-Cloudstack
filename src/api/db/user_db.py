@@ -61,3 +61,18 @@ class UserDB(Database):
         :return: user
         """
         return self.user_collection.update_one({"_id": user.id}, {"$set": user.dict()})
+
+    def get_all_users(self):
+        """
+        Get all users
+        :return: users
+        """
+        return self.user_collection.find()
+
+    def delete_user(self, user):
+        """
+        Delete user
+        :param user: username
+        :return: user
+        """
+        return self.user_collection.delete_one({"username": user.username})

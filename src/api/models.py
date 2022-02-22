@@ -22,6 +22,19 @@ class Vlan(BaseModel):
     description: str
     dot1q_id: int
 
+    @staticmethod
+    def from_dict(vlan):
+        """
+        This method is used to convert a dictionary to a Vlan object
+        :param vlan: a dictionary containing the VLAN's description and the VLAN's ID
+        :return: a Vlan object
+        """
+        vlan = Vlan(
+            description=vlan['description'],
+            dot1q_id=vlan['dot1q_id']
+        )
+        return vlan
+
 
 class Interface(BaseModel):
     """
@@ -34,6 +47,25 @@ class Interface(BaseModel):
     operstatus: Union[str, int]  # Can be provided as int for config creation
     vlan: Optional[Union[Vlan, int, None]]
     speed: Optional[int]
+
+    @staticmethod
+    def from_dict(interface):
+        """
+        This method is used to convert a dictionary to an Interface object
+        :param interface: a dictionary containing the interface's name, description, port ID, status, operation status,
+        VLAN ID and speed
+        :return: an Interface object
+        """
+        interface = Interface(
+            name=interface['name'],
+            description=interface['description'],
+            port_id=interface['port_id'],
+            status=interface['status'],
+            operstatus=interface['operstatus'],
+            vlan=interface['vlan'],
+            speed=interface['speed']
+        )
+        return interface
 
 
 class CdpNeighbor(BaseModel):
@@ -70,16 +102,47 @@ class Trunk(BaseModel):
                 bit_string += '0'
         return bit_string
 
+    @staticmethod
+    def from_dict(trunk):
+        """
+        This method is used to convert a dictionary to a Trunk object
+        :param trunk: a dictionary containing the trunk's interface, native VLAN, tagged VLANs and status
+        :return: a Trunk object
+        """
+        trunk = Trunk(
+            interface=Interface.from_dict(trunk['interface']),
+            native_vlan=trunk['native_vlan'],
+            tagged_vlans=trunk['tagged_vlans'],
+            status=trunk['status']
+        )
+        return trunk
+
 
 class Config(BaseModel):
     """
     That class defines the JSON model for add_config POST request
     """
-    name: str
+    name: Optional[str]
     hostname: Optional[str]
     interfaces: list[Interface]
     vlans: list[Vlan]
     trunks: list[Trunk]
+
+    @staticmethod
+    def from_dict(dict_config):
+        """
+        This method converts a dict to a Config object
+        """
+        config = Config(
+            name=dict_config.get('name'),
+            hostname=dict_config.get('hostname'),
+            interfaces=[Interface.from_dict(interface) for interface in dict_config['interfaces']],
+            vlans=[Vlan.from_dict(vlan) for vlan in dict_config['vlans']],
+            trunks=[Trunk.from_dict(trunk) for trunk in dict_config['trunks']]
+        )
+
+        return config
+
 
 
 class TrunkBrief(BaseModel):

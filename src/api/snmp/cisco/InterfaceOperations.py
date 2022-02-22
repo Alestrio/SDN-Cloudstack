@@ -67,7 +67,7 @@ class InterfaceOperations(AbstractOperations):
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
                           oid=self.config['interfaces']['oids']['sets']['vlan'] + '.' + str(interface_id),
                           value=str(dot1q_id),
-                          value_type='x')
+                          value_type='i')
         self.rebuild_cache_background()
 
     def get_interface_by_id(self, interface_id):

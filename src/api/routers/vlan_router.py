@@ -7,6 +7,7 @@
 
 from fastapi import APIRouter, HTTPException
 
+from src.api.models import Vlan
 from src.api.routers import ROUTE_PREFIX
 from src.api.routers import vlan_operations as operations
 
@@ -31,5 +32,14 @@ def get_vlan_id(vl_id: int):
         return vlan
     except Exception as e:
         raise HTTPException(status_code=404, detail="Vlan not found")
+
+
+@router.post("/vlans")
+def create_vlan(vlan: Vlan):
+    """Create a new vlan on the switch by issuing an SNMP Set request on the switch with snmp_cmds"""
+    #try:
+    operations.create_vlan(vlan.dot1q_id, vlan.description)
+    #except Exception as e:
+        #raise HTTPException(status_code=404, detail="cannot create vlan" + str(e))
 
 

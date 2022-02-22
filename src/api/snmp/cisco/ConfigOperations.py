@@ -33,15 +33,16 @@ class ConfigOperations(AbstractOperations):
         """Translate a config and set it to a switch
         :param config: the config to translate
         """
-        vlans = self.vlan_operations.get_vlannames_and_ids()
+        """vlans = self.vlan_operations.get_vlannames_and_ids()
         for vlan in config.vlans:
             if vlan not in vlans:
-                self.vlan_operations.add_vlan(vlan)
+                self.vlan_operations.add_vlan(vlan)"""
         for interface in config.interfaces:
-            self.interface_operations.set_interface_vlan(interface.vlan.dot1q_id, interface.port_id)
+            if interface.vlan:
+                self.interface_operations.set_interface_vlan(interface.vlan.dot1q_id, interface.port_id)
         for trunk in config.trunks:
-            self.trunk_operations.set_trunk(trunk.vlan.dot1q_id, trunk.port_id)
-        self.misc_operations.set_hostname(config.hostname)
+            self.trunk_operations.set_trunk(trunk.interface.port_id, trunk.tagged_vlans, trunk.native_vlan.dot1q_id)
+        #self.misc_operations.set_hostname(config.hostname)
         # rebuild the cache
         self.rebuild_cache_background()
         return

@@ -50,7 +50,7 @@ def get_running_config():
         config = operations.get_running_config()
         return config
     except Exception as e:
-        raise HTTPException(status_code=500, detail='Server error while getting running configuration')
+        raise HTTPException(status_code=500, detail='Server error while getting running configuration' + str(e))
 
 
 @router.get("/configs/running_cisco", response_class=PlainTextResponse)
@@ -95,3 +95,20 @@ def get_brief_configs():
         raise HTTPException(status_code=500, detail='Server error while getting configurations')
 
     return {'configs': configs}
+
+
+@router.post("/configs/apply/{config_id}")
+def apply_config(config_id: str):
+    # Apply a config from the mongoDB database to the switch
+    try:
+        config = db.get_config(config_id)
+        print(config)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while getting configuration')
+
+    try:
+        operations.translate_config_and_set_to_switch(Config.from_dict(config))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail='Server error while applying configuration')
+
+    return {'message': 'Configuration applied'}

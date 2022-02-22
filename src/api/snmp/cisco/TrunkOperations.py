@@ -151,7 +151,8 @@ class TrunkOperations(AbstractOperations):
                           value='4', community=self.community, value_type='i')  # Set encapsulation to dot1q (4 = dot1q)
         # Add trunk to the list of trunks
         self.get_trunks()
-        trunk = Trunk(interface_id=interface_id, native_vlan=native_vlan, tagged_vlans=tagged_vlans)
+        trunk = Trunk(interface=self.interface_operations.get_interface_by_id(interface_id),
+                      tagged_vlans=[], status='active')
         # set native vlan
         self.set_trunk_native_vlan(interface_id, native_vlan)
         trunk.native_vlan = native_vlan
