@@ -42,14 +42,34 @@ class VlanOperations(AbstractOperations):
 
     def add_vlan(self, vlan):
         """Add a vlan to the switch"""
+        # destroy the row
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
-                          oid=self.config['vlans']['oids']['add'],
-                          value=str(vlan.dot1q_id),
-                          value_type='i')
+                          oid=self.config['vlans']['set']['row_status'] + '.' + str(vlan.dot1q_id),
+                          value='6', value_type='i')
+        # Set vtpVlaneditOperation to copy
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
-                          oid=self.config['vlans']['oids']['name'] + '.' + str(vlan.dot1q_id),
-                          value=vlan.name,
-                          value_type='s')
+                          oid=self.config['vlans']['set']['operation'],
+                          value='2', value_type='i')
+        # set vtpVlaneditRowStatus to createAndGo
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['vlans']['set']['row_status'] + '.' + str(vlan.dot1q_id),
+                          value='4', value_type='i')
+        # set vtpVlaneditType to ethernetCsmacd
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['vlans']['set']['type'] + '.' + str(vlan.dot1q_id),
+                          value='1', value_type='i')
+        # set vtpVlaneditVlanName
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['vlans']['set']['name'] + '.' + str(vlan.dot1q_id),
+                          value=vlan.description, value_type='s')
+        # set vtpVlanEditDot1qSaid to vlan id
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['vlans']['set']['said'] + '.' + str(vlan.dot1q_id),
+                          value=str(hex(vlan.dot1q_id+100000)), value_type='x')
+        # set vtpVlanEditOperation to apply
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['vlans']['oids']['operation'] + '.' + str(vlan.dot1q_id),
+                          value='2', value_type='i')
         self.rebuild_cache_background()
 
     def get_vlan_by_id(self, vlan_id):
@@ -60,6 +80,10 @@ class VlanOperations(AbstractOperations):
             if vlan.dot1q_id == vlan_id:
                 return vlan
         return None
+
+    def create_vlan(self, vlan_id, vlan_name):
+        """Create a vlan on the switch"""
+        self.add_vlan(Vlan(dot1q_id=vlan_id, description=vlan_name))
 
     def invalidate_cache(self):
         beaker.cache.region_invalidate(self.get_vlannames_and_ids, "api_data")

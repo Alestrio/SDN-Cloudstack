@@ -8,6 +8,7 @@ import json
 
 import pymongo
 import yaml
+from bson import ObjectId
 
 
 class Database:
@@ -44,7 +45,7 @@ class Database:
         :param config_id: Id of the config
         :return: Config
         """
-        return self.configs_collections.find_one({'_id': config_id})
+        return self.configs_collections.find_one({'_id': ObjectId(config_id)})
 
     def delete_config(self, config_id):
         """

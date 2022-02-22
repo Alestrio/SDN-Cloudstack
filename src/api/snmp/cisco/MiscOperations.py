@@ -79,3 +79,9 @@ class MiscOperations(AbstractOperations):
         """Return the uptime of the switch"""
         return snmp_cmds.snmpwalk(ipaddress=self.ip, port=self.port, community=self.community,
                                   oid=self.config['uptime'])[0][1]
+
+    def set_hostname(self, hostname):
+        """Set the hostname of the switch"""
+        snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
+                          oid=self.config['systemName'], value=hostname, value_type='s')
+
