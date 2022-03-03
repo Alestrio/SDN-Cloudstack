@@ -43,6 +43,19 @@ def config_otg(room="Reseau-1"):
     print(api_link)
     return render_template('pages/t_configs_on_the_go.html', title='Config On The Go', api=api, len=len(api), interfaces=get_data(api_link, "interfaces"), trunks=get_data(api_link, "trunks"), vlans=get_data(api_link, "vlans"))
 
+@app.route("/interfaces/<room>")
+def interfaces(room="Reseau-1"):
+    api_link = f"http://{api[room]}{api_base_link}"
+    interfaces = get_interfaces(api_link)
+    filteredInterfaces = {'top': [],'bottom': [], 'r3': []}
+    for int in interfaces:
+        if int['name'].startswith('FastEthernet1') or int['name'].startswith('GigabitEthernet1'): 
+            filteredInterfaces['top'].append(int)
+        elif int['name'].startswith('FastEthernet2') or int['name'].startswith('GigabitEthernet2'):
+            filteredInterfaces['bottom'].append(int)
+        elif int['name'].startswith('GigabitEthernet0'):
+            filteredInterfaces['r3'].append(int)
+    return render_template('pages/t_switch_int.html', interfaces=filteredInterfaces, room=room)
 
 #Error
 
@@ -76,7 +89,7 @@ def get_vlans(api_link):
 
 def get_interfaces(api_link):
     content = urllib.request.urlopen(f"{api_link}interfaces")
-    content = json.load(content, )
+    content = json.load(content)
     return content
 
 def get_data(api_link, data_type):
