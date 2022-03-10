@@ -1,0 +1,100 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+{{super()}}
+<!--- include script for this page -->
+<script src="{{url_for('static', filename='js/config_otg.js')}}"></script>
+<div class= "content flex flex-grow h-full w-full flex-col md:flex-row">
+    <div class="border-2 w-1\/2 w-full flex-grow flex md:h-full flex-col sm:h-2/5" >
+        <div class="h-full w-full p-1"><textarea class="resize-y h-full border-black border-2 w-full rounded-md" id="config_input" name="config"></textarea></div>
+        <div class="h-1/6 w-full items-center text-center m-auto"><button onclick="" class="hover:bg-blue-100 px-2 py-2 rounded-md">Send-config</button></div>
+    </div>
+    <div class="border-2 flex-grow w-1\/2 w-full md:h-full h-3/5">
+        <div class="text-center m-auto w-full"><button class="px-1 m-auto" onclick="ShowAndHide('interface')">Interfaces</button><button class="px-1 m-auto" onclick="ShowAndHide('vlans')">Vlans</button><button class="px-1 m-auto" onclick="ShowAndHide('trunks')">Trunks</button></div>
+        <div class="flex flex-col w-full h-full">
+            <div class="h-2\/5 w-full h-full overflow-x-scroll border-1" style="display: none;" id=interface>
+                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                    <thead>
+                    <tr>
+                        <th colspan="3">Interfaces</th>
+                    </tr>
+                    <tr>
+                        <th class="border border-gray-400">Name</th>
+                        <th class="border border-gray-400">Native Vlan</th>
+                        <th class="border border-gray-400">Status</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {%for interface in interfaces%}
+                    <tr>
+                        <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{interface}}))">{{interface['name']}}</button></th>
+                        <th class="border border-gray-400 text-xs md:text-lg">{{interface['vlan']['description']}}</th>
+                        {%if interface['status'] == 'up'%}
+                        <th class="border border-gray-400 bg-green-200">{{interface['status']}}</th>
+                        {%else%}
+                        <th class="border border-gray-400 bg-red-200">{{interface['status']}}</th>
+                        {%endif%}
+                    </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <div class="h-1\/5 w-full h-full overflow-x-scroll "  id=vlans style="display: none;">
+                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                    <thead>
+                    <tr>
+                        <th colspan="2">Vlans</th>
+                    </tr>
+                    <tr>
+                        <th class="border border-gray-400">Name</th>
+                        <th class="border border-gray-400">Vlan_ID</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {%for vlan in vlans%}
+                    <tr>
+                        <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{vlan}}))">{{vlan['description']}}</button></th>
+                        <th class="border border-gray-400">{{vlan['dot1q_id']}}</th>
+                    </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+            <div class="h-2\/5 w-full h-full overflow-x-scroll" id=trunks style="display: none;">
+                <table class=" w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+                    <thead>
+                    <tr>
+                        <th colspan="4">Trunks</th>
+                    </tr>
+                    <tr>
+                        <th class="border border-gray-400">Interface</th>
+                        <th class="border border-gray-400">Vlan</th>
+                        <th class="border border-gray-400">Status</th>
+                        <th class="border border-gray-400">Tagged vlans</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {%for trunk in trunks%}
+                    <tr>
+                        <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{trunk}}))">{{trunk['interface']['name']}}</button></th>
+                        <th class="border border-gray-400">{{trunk['interface']['vlan']['description']}}</th>
+                        {%if trunk['interface']['status'] == 'up'%}
+                        <th class="border border-gray-400 bg-green-200">{{trunk['interface']['status']}}</th>
+                        {%else%}
+                        <th class="border border-gray-400 bg-red-200">{{trunk['interface']['status']}}</th>
+                        {%endif%}
+                        <th class="border border-gray-400">
+                            <ul>
+                                {%for tagged in trunk['tagged_vlans']%}
+                                <li>{{tagged['description']}}</li>
+                                {%endfor%}
+                            </ul>
+                        </th>
+                    </tr>
+                    {%endfor%}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{%endblock%}

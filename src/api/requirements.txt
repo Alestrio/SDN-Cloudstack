@@ -1,0 +1,16 @@
+aniso8601==8.0.0
+click==7.1.2
+itsdangerous==1.1.0
+Jinja2==2.11.2
+MarkupSafe==1.1.1
+pytz==2020.1
+six==1.15.0
+pysnmp~=4.4.12
+
+fastapi~=0.70.0
+pydantic~=1.8.2
+pymongo~=3.12.1
+PyYAML~=6.0
+uvicorn~=0.15.0
+Beaker~=1.11.0
+pysmi~=0.3.4
