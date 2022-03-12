@@ -20,7 +20,7 @@ api.include_router(interface_router.router)
 api.include_router(vlan_router.router)
 api.include_router(trunk_router.router)
 api.include_router(config_router.router)
-api.include_router(auth_router.router)
+# api.include_router(auth_router.router)
 api.include_router(misc_router.router)
 
 if __name__ == "__main__":
