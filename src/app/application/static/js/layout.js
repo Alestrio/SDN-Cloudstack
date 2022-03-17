@@ -1,0 +1,18 @@
+/*
+ * SDN-Cloudstack - API
+ * Third semester project, Technical Degree, Networks and Telecommunications
+ * Copyright (c) 2021-2022
+ * Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
+ * This code belongs exclusively to its authors, use, redistribution or
+ * reproduction forbidden except with authorization from the authors.
+ */
+
+// function toggle menu :
+function toggleMenu() {
+    if (document.getElementById("navbar").style.display === "block") {
+        document.getElementById("navbar").style.display = "none";
+    } else {
+        document.getElementById("navbar").style.display = "block";
+    }
+}
+
