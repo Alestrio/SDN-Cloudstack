@@ -23,9 +23,13 @@
             </svg>
         </button>
     <div>
-        <select class="header text-white text-sm md:text-xl align-middle" onchange="if (this.value) window.location.href=this.value" >
-            {%for room in api%}s
-            <option value="/config-otg/{{room}}">{{room}}</option>
+        <select class="header text-white text-sm md:text-xl align-middle" onchange="if (this.value) window.location.href=this.value">
+            {%for room in api%}
+                {% if selected == room %}
+                    <option value="./{{room}}" selected>{{room}}</option>
+                {%else%}
+                    <option value="./{{room}}">{{room}}</option>
+                {%endif%}
             {%endfor%}
         </select>
     </div>
@@ -42,6 +46,7 @@
         </div>
     {%endif%}
 </header>
+
 <main class=" w-full h-full">
     <div class="flex w-full h-full">
         <div class="flex w-1\/5 h-full flex-none overflow-y-none ">
@@ -54,6 +59,8 @@
                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
                         <a href="/config/"
                            class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                        <a href="/interfaces/{{room}}"
+                           class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Interfaces</a>
                     </div>
                 </div>
             </div>
