@@ -1,6 +1,7 @@
 {% extends 'pages/t_layout.html' %} {%block content%} {{super()}}
-<div class="overflow-auto w-auto">
-  <div class="overflow-x-auto w-max space-x-2 flex flex-col pr-44">
+<div class="overflow-auto w-auto items-center">
+  <h1 class="text-4xl center p-4 shadow-lg text-center bg-local">Résumé et état des ports de la salle :</h1>
+  <div class="overflow-x-auto w-max p-6 shadow-2xl rounded m-6 space-x-2 flex flex-col pr-44">
     {% if room == 'Reseau-1' %}
     <!-- First block -->
     <div

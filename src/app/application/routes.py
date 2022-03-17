@@ -6,7 +6,7 @@
 #  reproduction forbidden except with authorization from the authors.
 import yaml
 from application import app
-from flask import render_template, session, request
+from flask import render_template, session, request, redirect, url_for
 import urllib
 import json
 
@@ -15,19 +15,6 @@ from yaml import Loader
 api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3'}
 selected_api = 'Reseau-1'
 api_base_link = ".api.sdn.chalons.univ-reims.fr/api/v1.5/"
-
-
-# Route
-@app.route("/")
-@app.route("/home/")
-def home():
-    session['username'] = None
-    return render_template('pages/t_index.html', title='Index', api=api, len=len(api), selected=selected_api, user=session.get('username'))
-
-
-@app.route("/resume/")
-def resume():
-    return render_template("pages/t_resume.html", title='Resume', api=api, len=len(api), selected=selected_api, user=session.get('username'))
 
 
 @app.route("/login/", methods=['GET', 'POST'])
@@ -50,7 +37,7 @@ def login():
                     session['logged_in'] = True
                     session['username'] = username
                     # Redirect to the home page
-                    return render_template('pages/t_index.html', title='Index', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+                    return redirect(url_for('interfaces'))
             return render_template('pages/t_config.html', title='Config', api=api, len=len(api), user=session.get('username'), selected=selected_api)
         else:
             return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
@@ -82,6 +69,11 @@ def config_otg(room="Reseau-1"):
                            vlans=get_data(api_link, "vlans"), room=room, selected=selected_api, user=session.get('username'))
 
 
+# Route
+@app.route("/")
+@app.route("/resume/")
+@app.route("/resume/<room>")
+@app.route("/<room>")
 @app.route("/interfaces/<room>")
 def interfaces(room="Reseau-1"):
     selected_api = room
