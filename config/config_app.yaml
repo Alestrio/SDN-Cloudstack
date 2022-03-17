@@ -1,0 +1,11 @@
+# users :
+users:
+  - admin:
+      password: admin
+      roles:
+        - admin
+        - user
+  - user:
+      password: user
+      roles:
+        - user

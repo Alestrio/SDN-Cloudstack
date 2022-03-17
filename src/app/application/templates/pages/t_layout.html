@@ -32,9 +32,15 @@
     <div class="flex-auto text-center">
         <p class="text-sm md:text-xl align-middle">{{title}}</p>
     </div>
-    <div class="flex-auto text-center">
-        <button class="px-5 text-sm md:text-xl align-middle"><a href="t_login.html">Login</a></button>
-    </div>
+    {% if user %}
+        <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle"><a href="/logout">{{ user }}</a></button>
+        </div>
+    {%else%}
+        <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle"><a href="/login">Login</a></button>
+        </div>
+    {%endif%}
 </header>
 <main class=" w-full h-full">
     <div class="flex w-full h-full">
