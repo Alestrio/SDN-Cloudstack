@@ -12,7 +12,7 @@ import json
 
 from yaml import Loader
 
-api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3'}
+api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3', 'Test': 'test'}
 selected_api = 'Reseau-1'
 api_base_link = ".api.sdn.chalons.univ-reims.fr/api/v1.5/"
 
@@ -50,7 +50,7 @@ def logout():
     # Remove the username from the session if it's there
     session.pop('logged_in', None)
     session.pop('username', None)
-    return render_template('pages/t_index.html', title='Index', api=api, len=len(api), selected=selected_api)
+    return redirect(url_for('resume'))
 
 
 @app.route("/config/")
@@ -74,25 +74,32 @@ def config_otg(room="Reseau-1"):
 @app.route("/resume/")
 @app.route("/resume/<room>")
 @app.route("/<room>")
-@app.route("/interfaces/<room>")
 def interfaces(room="Reseau-1"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     interfaces = get_interfaces(api_link)
     filteredInterfaces = {'top': [], 'bottom': [], 'r3': []}
-    for int in interfaces:
-        if int['name'].startswith('FastEthernet1') or int['name'].startswith('GigabitEthernet1'):
-            filteredInterfaces['top'].append(int)
-        elif int['name'].startswith('FastEthernet2') or int['name'].startswith('GigabitEthernet2'):
-            filteredInterfaces['bottom'].append(int)
-        elif int['name'].startswith('GigabitEthernet0'):
-            filteredInterfaces['r3'].append(int)
-    return render_template('pages/t_switch_int.html', interfaces=filteredInterfaces, room=room, user=session.get('username'),
+    return render_template('pages/t_resume.html', interfaces=interfaces, room=room, user=session.get('username'),
                            api=api, selected=selected_api, len=len(api))
 
 
-# Error
+@app.route("/interface/<room>/<iface_id>")
+def interface(room, iface_id):
+    selected_api = room
+    if session.get('logged_in'):
+        api_link = f"http://{api[selected_api]}{api_base_link}"
+        interfaces = get_interfaces(api_link)
+        for iface in interfaces:
+            if iface['port_id'] == int(iface_id):
+                print(iface['status'])
+                return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
+                                       api=api, selected=selected_api, len=len(api))
+        return render_template('errors/e_interface.html', user=session.get('username'), api=api, selected=selected_api, len=len(api))
+    else:
+        return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
 
+
+# Error handlers.
 @app.errorhandler(404)
 def custom_error(error):
     return render_template('errors/e_not_found.html', title='Page Not Found', api=api, selected=selected_api, len=len(api))
