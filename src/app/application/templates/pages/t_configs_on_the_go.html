@@ -51,10 +51,12 @@
                     </thead>
                     <tbody>
                     {%for vlan in vlans%}
-                    <tr>
-                        <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{vlan}}))">{{vlan['description']}}</button></th>
-                        <th class="border border-gray-400">{{vlan['dot1q_id']}}</th>
-                    </tr>
+                        {%if vlan['dot1q_id'] >=200%}
+                            <tr>
+                                <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{vlan}}))">{{vlan['description']}}</button></th>
+                                <th class="border border-gray-400">{{vlan['dot1q_id']}}</th>
+                            </tr>
+                        {%endif%}
                     {%endfor%}
                     </tbody>
                 </table>
@@ -67,7 +69,7 @@
                     </tr>
                     <tr>
                         <th class="border border-gray-400">Interface</th>
-                        <th class="border border-gray-400">Vlan</th>
+                        <th class="border border-gray-400">Native Vlan</th>
                         <th class="border border-gray-400">Status</th>
                         <th class="border border-gray-400">Tagged vlans</th>
                     </tr>
@@ -76,7 +78,7 @@
                     {%for trunk in trunks%}
                     <tr>
                         <th class="border border-gray-400 text-xs md:text-lg"><button onclick="setConfig_input(({{trunk}}))">{{trunk['interface']['name']}}</button></th>
-                        <th class="border border-gray-400">{{trunk['interface']['vlan']['description']}}</th>
+                        <th class="border border-gray-400">{{trunk['native_vlan']['description']}}</th>
                         {%if trunk['interface']['status'] == 'up'%}
                         <th class="border border-gray-400 bg-green-200">{{trunk['interface']['status']}}</th>
                         {%else%}
@@ -85,7 +87,9 @@
                         <th class="border border-gray-400">
                             <ul>
                                 {%for tagged in trunk['tagged_vlans']%}
-                                <li>{{tagged['description']}}</li>
+                                    {%if tagged >= 200 and trunk['native_vlan']['description'] != 'actifs'%}
+                                        <li>{{tagged}}</li>
+                                    {%endif%}
                                 {%endfor%}
                             </ul>
                         </th>
