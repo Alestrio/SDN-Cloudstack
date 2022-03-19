@@ -83,20 +83,31 @@ def interfaces(room="Reseau-1"):
                            api=api, selected=selected_api, len=len(api))
 
 
-@app.route("/interface/<room>/<iface_id>")
+@app.route("/interface/<room>/<iface_id>", methods=['GET', 'POST'])
 def interface(room, iface_id):
     selected_api = room
-    if session.get('logged_in'):
-        api_link = f"http://{api[selected_api]}{api_base_link}"
-        interfaces = get_interfaces(api_link)
-        for iface in interfaces:
-            if iface['port_id'] == int(iface_id):
-                print(iface['status'])
-                return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
-                                       api=api, selected=selected_api, len=len(api))
-        return render_template('errors/e_interface.html', user=session.get('username'), api=api, selected=selected_api, len=len(api))
+    api_link = f"http://{api[selected_api]}{api_base_link}"
+    interfaces = get_interfaces(api_link)
+    for iface_data in interfaces:
+        if iface_data['port_id'] == int(iface_id):
+            iface = iface_data
+    if not iface:
+        return render_template('errors/e_404.html', title='404', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+    if request.method == 'POST':
+        iface_status = iface['status']
+        iface_vlan = iface['vlan']['dot1q_id']
+        if int(request.form['vlan']) != iface_vlan:
+            # Change the vlan
+            post_request(api_link, f"/api/v1.5/interface/{iface_id}/vlan/{request.form['vlan']}")
+        if request.form['status'] != iface_status:
+            # Change the status
+            post_request(api_link, f"/api/v1.5/interface/{iface_id}/status/{'true' if request.form['status'] == 'up' else 'false'}")
     else:
-        return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+        if session.get('logged_in'):
+            return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
+                                       api=api, selected=selected_api, len=len(api))
+        else:
+            return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
 
 
 # Error handlers.
@@ -151,3 +162,14 @@ def get_data(api_link, data_type):
             i += 1
 
     return content
+
+def post_request(api_link, data_type, data):
+    """
+    Allows to post data to the api
+    :param api_link:
+    """
+    url = f"{api_link}{data_type}"
+    data = json.dumps(data).encode('utf8')
+    req = urllib.request.Request(url, data, headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response
