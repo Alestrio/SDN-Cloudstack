@@ -1,0 +1,12 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+{{super()}}
+<div class= "content flex-col w-full h-full">
+    <div class = " m-auto flex-col text-center text-black">
+        <h1 class = "text-3xl font-bold">Unauthorized</h1>
+        <p class = "text-xl">Uh oh! You don't have permission to access this page !</p>
+        <img class="m-auto object-contain h-96 w-150 object-center" src="/static/img/forbiden.png" alt="forbiden.png">
+        <a href="/" class="text-white bg-gray-400 rounded-md px-3 py-1 text-m font-medium">HOME</a>
+    </div>
+</div>
+{%endblock%}

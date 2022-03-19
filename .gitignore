@@ -4,3 +4,19 @@ mibs/
 venv/
 
 config/config.yaml
+
+src/application/trunk.yaml
+
+config/net-snmp-5.5.0-2.x64.exe
+
+config/net-snmp-5.9.1.zip
+
+src/application/interface.json
+
+src/application/interface.yaml
+
+src/application/runing-config.json
+
+src/application/runing-config.yaml
+
+src/application/trunk.json

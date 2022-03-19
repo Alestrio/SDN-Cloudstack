@@ -83,7 +83,7 @@ def set_trunk(trunk: TrunkIn):
 
 
 @router.post("/trunks/{tr_id}/tagged_vlan/{vlan_id}")
-def tagged_vlan(tr_id: str, vlan_id: str, user=Depends(get_current_admin_user)):
+def tagged_vlan(tr_id: str, vlan_id: str): #, user=Depends(get_current_admin_user)):
     """
     Add a tagged vlan to a trunk
     """
@@ -94,7 +94,7 @@ def tagged_vlan(tr_id: str, vlan_id: str, user=Depends(get_current_admin_user)):
 
 
 @router.put("/trunks/{tr_id}/native_vlan/{vlan_id}")
-def native_vlan(tr_id: str, vlan_id: str, user=Depends(get_current_admin_user)):
+def native_vlan(tr_id: str, vlan_id: str): #, user=Depends(get_current_admin_user)):
     """
     Set the native vlan of a trunk
     """

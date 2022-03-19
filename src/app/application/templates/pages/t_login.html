@@ -1,0 +1,30 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+    {{super()}}
+    <!-- login form -->
+    <div class="container w-full h-full flex flex-grow items-center justify-center">
+        <div class="row w-2/3 h-2/3 flex flex-grow justify-center">
+            <form id="login-form" action="{{url_for('login')}}" method="post" role="form"
+                  class="w-4/5 md:w-2/3 p-4 flex flex-col items-center shadow-2xl">
+                <h1 class="text-4xl p-4 text-center">Connexion utilisateur :</h1>
+                <div class="form-group p-3">
+                    <input type="text" name="username" id="username" tabindex="1" class="form-control border-2 p-2 rounded-lg" placeholder="Username" value="">
+                </div>
+                <div class="form-group p-4">
+                    <input type="password" name="password" id="password" tabindex="2" class="form-control border-2 p-2 rounded-lg" placeholder="Password">
+                </div>
+                <div class="form-group p-4">
+                    <input type="checkbox" tabindex="3" class="" name="remember" id="remember">
+                    <label for="remember"> Remember Me</label>
+                </div>
+                <div class="form-group p-4">
+                    <div class="row">
+                        <div class="col-sm-6 col-sm-offset-3">
+                            <input type="submit" name="login-submit" id="login-submit" tabindex="4" class="form-control btn btn-login p-2 rounded-lg" value="Log In">
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+{%endblock%}

@@ -15,7 +15,7 @@ from src.api.routers import vlan_operations, interface_operations, \
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Miscellaneous"],
-                   dependencies=[Depends(get_current_admin_user)],
+                   # dependencies=[Depends(get_current_admin_user)],
                    responses={404: {"description": "Not found"}}
                    )
 

@@ -16,7 +16,7 @@ from src.api.routers import config_operations as operations
 
 router = APIRouter(prefix=ROUTE_PREFIX,
                    tags=["Config"],
-                   dependencies=[Depends(get_current_admin_user)],
+                   #dependencies=[Depends(get_current_admin_user)],
                    responses={404: {"description": "Not found"}}
                    )
 

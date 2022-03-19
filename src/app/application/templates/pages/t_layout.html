@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/main.css">
+    <link rel="stylesheet" href="/static/css/tailwind.css">
+    <script src="/static/js/layout.js"></script>
+    {% if title %}<title>SDN-Cloudstack - {{title}}</title>
+    {%else%}<title>SDN-Cloudstack</title>{%endif%}
+</head>
+<body class="flex-col w-screen h-screen overflow-hidden">
+<header class=" header flex w-full h-14 md:h-20  items-center text-2xl font-extrabold text-white space-x-5">
+    <div>
+        <button class="px-5 grow hidden md:block"><a href="/">SDN-Cloudstack</a></button>
+    </div>
+    <!---- Menu fold button ---->
+    <div class="flex-1 flex justify-end items-center align-middle">
+        <button class="block md:hidden" onclick="toggleMenu()">
+            <svg class="h-6 w-6 fill-current text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z"/>
+            </svg>
+        </button>
+    <div>
+        <select class="header text-white text-sm md:text-xl align-middle" onchange="if (this.value) window.location.href=this.value">
+            {%for room in api%}
+                {% if selected == room %}
+                    <option value="./{{room}}" selected>{{room}}</option>
+                {%else%}
+                    <option value="./{{room}}">{{room}}</option>
+                {%endif%}
+            {%endfor%}
+        </select>
+    </div>
+    <div class="flex-auto text-center">
+        <p class="text-sm md:text-xl align-middle">{{title}}</p>
+    </div>
+    {% if user %}
+        <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle rounded bg-green-500"><a href="/cache_reload/{{ room }}">Refresh</a></button>
+            <button class="px-5 text-sm md:text-xl align-middle"><a href="/logout">{{ user }}</a></button>
+        </div>
+    {%else%}
+        <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle rounded bg-green-500"><a href="/cache_reload/{{ room }}">Refresh</a></button>
+            <button class="px-5 text-sm md:text-xl align-middle"><a href="/login">Login</a></button>
+        </div>
+    {%endif%}
+</header>
+
+<main class=" w-full h-full">
+    <div class="flex w-full h-full">
+        <div class="flex w-1\/5 h-full flex-none overflow-y-none ">
+            <div class="navbar flex flex-col hidden md:block" id="navbar">
+                <div>
+                    <div class="flex flex-col w-44 items-justify px-8 py-4">
+                        <a href="/resume/"
+                           class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Resume</a>
+                        <a href="/config-otg/"
+                           class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Configs-OTG</a>
+                        <a href="/config/"
+                           class="text-white hover:bg-gray-400 px-3 py-2 my-2 rounded-md text-m font-medium">Config</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="flex w-full w-4\/5 h-full">
+            {%block content%}{%endblock%}
+        </div>
+    </div>
+</main>
+{%block script%}{%endblock%}
+</body>

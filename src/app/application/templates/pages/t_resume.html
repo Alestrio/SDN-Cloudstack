@@ -1,0 +1,22 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+    {{super()}}
+    <div class="overflow-scroll w-full items-center object-fill">
+        <h1 class="text-4xl center p-4 shadow-lg text-center bg-local">Résumé et état des ports de la salle :</h1>
+        <div class="grid grid-cols-3 md:grid-cols-6 xl:grid-cols-12 w-full p-2 m-4 gap-2 overflow-x-scroll">
+            {% for int in interfaces %}
+                <a href="/interface/{{ room }}/{{ int.port_id }}">
+                    <div class="w-28 object-contain block flex flex-col items-center justify-center bg-gray-300
+                            hover:bg-gray-400 shadow-lg rounded p-1 m-1 flex-grow">
+                        <span class="h-8 w-8 rounded {{('bg-red-500', 'bg-green-500')[int.status == 'up']}}"></span>
+                        <p class="text-center text-xs">
+                            {{int.name}}<br />
+                            VLAN ID: {{int.vlan.dot1q_id}}<br />
+                            {{int.vlan.description}}
+                        </p>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+{%endblock%}
