@@ -74,11 +74,10 @@ def config_otg(room="Reseau-1"):
 @app.route("/resume/")
 @app.route("/resume/<room>")
 @app.route("/<room>")
-def interfaces(room="Reseau-1"):
+def resume(room="Reseau-1"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
-    interfaces = get_interfaces(api_link)
-    filteredInterfaces = {'top': [], 'bottom': [], 'r3': []}
+    interfaces = get_data(api_link, "interfaces")
     return render_template('pages/t_resume.html', interfaces=interfaces, room=room, user=session.get('username'),
                            api=api, selected=selected_api, len=len(api))
 
@@ -99,14 +98,19 @@ def interface(room, iface_id):
         if int(request.form['vlan']) != iface_vlan:
             # Change the vlan
             response = post_request(f"{api_link}interfaces/{iface_id}/vlan/{request.form['vlan']}", None, None)
+            iface['vlan']['dot1q_id'] = int(request.form['vlan'])
             #if response.status_code != 200:
             #    print(response.status_code)
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
         if request.form['status'] != iface_status:
             # Change the status
             response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == 'up' else 'false'}", None, None)
+            iface['status'] = 'up' if request.form['status'] == 'up' else 'down'
             #if response.status_code != 200:
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+        for data in interfaces:
+            if data['port_id'] == int(iface_id):
+                interfaces[interfaces.index(data)] = iface
         return redirect('/resume/' + room)
     else:
         if session.get('logged_in'):
@@ -120,6 +124,7 @@ def interface(room, iface_id):
 def cache_reload(selected_api="Reseau-1"):
     # Get request
     response = get_request(f"http://{api[selected_api]}{api_base_link}rebuild")
+    print(f"http://{api[selected_api]}{api_base_link}rebuild")
     return redirect('/resume/' + selected_api)
 
 
@@ -137,7 +142,6 @@ def custom_error(error):
 @app.errorhandler(400)
 def custom_error(error):
     return render_template('errors/e_bad_request.html', title='Bad Request', selected=selected_api, api=api, len=len(api))
-
 
 # Get from api
 def get_trunks(api_link):
