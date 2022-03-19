@@ -98,7 +98,7 @@ def interface(room, iface_id):
         iface_vlan = iface['vlan']['dot1q_id']
         if int(request.form['vlan']) != iface_vlan:
             # Change the vlan
-            response = post_request(f"{api_link}interface/{iface_id}/vlan/{request.form['vlan']}", None, None)
+            response = post_request(f"{api_link}interfaces/{iface_id}/vlan/{request.form['vlan']}", None, None)
             #if response.status_code != 200:
             #    print(response.status_code)
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
