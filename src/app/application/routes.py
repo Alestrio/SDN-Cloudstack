@@ -37,7 +37,7 @@ def login():
                     session['logged_in'] = True
                     session['username'] = username
                     # Redirect to the home page
-                    return redirect(url_for('interfaces'))
+                    return redirect('/resume/')
             return render_template('pages/t_config.html', title='Config', api=api, len=len(api), user=session.get('username'), selected=selected_api)
         else:
             return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
@@ -77,8 +77,9 @@ def config_otg(room="Reseau-1"):
 def resume(room="Reseau-1"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
-    interfaces = get_data(api_link, "interfaces")
-    return render_template('pages/t_resume.html', interfaces=interfaces, room=room, user=session.get('username'),
+    if session.get(api[room]) is None:
+        session[api[room]] = {'interfaces': get_interfaces(api_link)}
+    return render_template('pages/t_resume.html', interfaces=session[api[room]]['interfaces'], room=room, user=session.get('username'),
                            api=api, selected=selected_api, len=len(api))
 
 
@@ -86,8 +87,9 @@ def resume(room="Reseau-1"):
 def interface(room, iface_id):
     selected_api = room
     api_link = f"http://{api[selected_api]}{api_base_link}"
-    interfaces = get_interfaces(api_link)
-    for iface_data in interfaces:
+    if session.get(api[room]) is None:
+        session[api[room]] = {'interfaces': get_interfaces(api_link)}
+    for iface_data in session[api[room]]['interfaces']:
         if iface_data['port_id'] == int(iface_id):
             iface = iface_data
     if not iface:
@@ -104,14 +106,22 @@ def interface(room, iface_id):
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
         if request.form['status'] != iface_status:
             # Change the status
-            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == 'up' else 'false'}", None, None)
-            iface['status'] = 'up' if request.form['status'] == 'up' else 'down'
+            print(request.form['status'])
+            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == '1' else 'false'}", None, None)
+            iface['status'] = 'up' if request.form['status'] == '1' else 'down'
             #if response.status_code != 200:
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
-        for data in interfaces:
-            if data['port_id'] == int(iface_id):
-                interfaces[interfaces.index(data)] = iface
-        return redirect('/resume/' + room)
+        # Update the interface in the session with the new data iface
+        for iface_data in range(len(session[api[room]]['interfaces'])):
+            if session[api[room]]['interfaces'][iface_data]['port_id'] == iface['port_id']:
+                print(iface)
+                session[api[room]]['interfaces'][iface_data] = iface
+        for iface_data in range(len(session[api[room]]['interfaces'])):
+            if session[api[room]]['interfaces'][iface_data]['port_id'] == iface['port_id']:
+                print(session[api[room]]['interfaces'][iface_data])
+        return render_template('pages/t_resume.html', interfaces=session[api[room]]['interfaces'], room=room,
+                               user=session.get('username'),
+                               api=api, selected=selected_api, len=len(api))
     else:
         if session.get('logged_in'):
             return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
@@ -123,6 +133,7 @@ def interface(room, iface_id):
 @app.route('/cache_reload/<selected_api>')
 def cache_reload(selected_api="Reseau-1"):
     # Get request
+    session[api[selected_api]] = None
     response = get_request(f"http://{api[selected_api]}{api_base_link}rebuild")
     print(f"http://{api[selected_api]}{api_base_link}rebuild")
     return redirect('/resume/' + selected_api)
