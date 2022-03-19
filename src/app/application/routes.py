@@ -12,7 +12,7 @@ import json
 
 from yaml import Loader
 
-api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3'}
+api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3', 'Test': 'test'}
 selected_api = 'Reseau-1'
 api_base_link = ".api.sdn.chalons.univ-reims.fr/api/v1.5/"
 
@@ -50,7 +50,7 @@ def logout():
     # Remove the username from the session if it's there
     session.pop('logged_in', None)
     session.pop('username', None)
-    return render_template('pages/t_index.html', title='Index', api=api, len=len(api), selected=selected_api)
+    return redirect('/resume')
 
 
 @app.route("/config/")
@@ -74,25 +74,56 @@ def config_otg(room="Reseau-1"):
 @app.route("/resume/")
 @app.route("/resume/<room>")
 @app.route("/<room>")
-@app.route("/interfaces/<room>")
 def interfaces(room="Reseau-1"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     interfaces = get_interfaces(api_link)
     filteredInterfaces = {'top': [], 'bottom': [], 'r3': []}
-    for int in interfaces:
-        if int['name'].startswith('FastEthernet1') or int['name'].startswith('GigabitEthernet1'):
-            filteredInterfaces['top'].append(int)
-        elif int['name'].startswith('FastEthernet2') or int['name'].startswith('GigabitEthernet2'):
-            filteredInterfaces['bottom'].append(int)
-        elif int['name'].startswith('GigabitEthernet0'):
-            filteredInterfaces['r3'].append(int)
-    return render_template('pages/t_switch_int.html', interfaces=filteredInterfaces, room=room, user=session.get('username'),
+    return render_template('pages/t_resume.html', interfaces=interfaces, room=room, user=session.get('username'),
                            api=api, selected=selected_api, len=len(api))
 
 
-# Error
+@app.route("/interface/<room>/<iface_id>", methods=['GET', 'POST'])
+def interface(room, iface_id):
+    selected_api = room
+    api_link = f"http://{api[selected_api]}{api_base_link}"
+    interfaces = get_interfaces(api_link)
+    for iface_data in interfaces:
+        if iface_data['port_id'] == int(iface_id):
+            iface = iface_data
+    if not iface:
+        return render_template('errors/e_404.html', title='404', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+    if request.method == 'POST':
+        iface_status = iface['status']
+        iface_vlan = iface['vlan']['dot1q_id']
+        if int(request.form['vlan']) != iface_vlan:
+            # Change the vlan
+            response = post_request(f"{api_link}interfaces/{iface_id}/vlan/{request.form['vlan']}", None, None)
+            #if response.status_code != 200:
+            #    print(response.status_code)
+            #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+        if request.form['status'] != iface_status:
+            # Change the status
+            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == 'up' else 'false'}", None, None)
+            #if response.status_code != 200:
+            #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+        return redirect('/resume/' + room)
+    else:
+        if session.get('logged_in'):
+            return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
+                                       api=api, room=api[selected_api], selected=selected_api, len=len(api))
+        else:
+            return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
 
+
+@app.route('/cache_reload/<selected_api>')
+def cache_reload(selected_api="Reseau-1"):
+    # Get request
+    response = get_request(f"http://{api[selected_api]}{api_base_link}rebuild")
+    return redirect('/resume/' + selected_api)
+
+
+# Error handlers.
 @app.errorhandler(404)
 def custom_error(error):
     return render_template('errors/e_not_found.html', title='Page Not Found', api=api, selected=selected_api, len=len(api))
@@ -144,3 +175,19 @@ def get_data(api_link, data_type):
             i += 1
 
     return content
+
+
+def get_request(api_link):
+    return urllib.request.urlopen(api_link)
+
+
+def post_request(api_link, data_type, data):
+    """
+    Allows to post data to the api
+    :param api_link:
+    """
+    data = json.dumps(data).encode('utf8')
+    print(api_link)
+    req = urllib.request.Request(api_link, data, headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response

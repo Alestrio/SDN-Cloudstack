@@ -1,0 +1,13 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+{{super()}}
+<div class= "content flex-col w-full h-full">
+    <div class = " m-auto flex-col text-center text-black">
+        <h1 class = "text-3xl font-bold">{{error.message}}</h1>
+        <h2 class = "text-2xl font-bold">{{error.status}}</h2>
+        <p class="text-xl">There was an error with your request</p>
+        <img class="m-auto object-contain h-96 w-150 object-center" src="/static/img/bad-request.jpg" alt="not-found.jpg">
+        <a href="/" class="text-white bg-gray-400 rounded-md px-3 py-1 text-m font-medium">HOME</a>
+    </div>
+</div>
+{%endblock%}
