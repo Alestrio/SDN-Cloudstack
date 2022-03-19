@@ -6,7 +6,7 @@
         <div class="w-full max-w-lg">
             <h1 class="text-4xl text-center">Edition d'interface :</h1>
             <h2 class="text-2xl text-center">{{interface.description}}</h2>
-            <form class="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4" action="/interface/{{ interface.port_id }}" method="POST">
+            <form class="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4" action="/interface/{{ selected }}/{{ interface.port_id }}" method="POST">
                 <div class="mb-4">
                     <label class="block text-gray-700 text-sm font-bold mb-2" for="name">
                         Statut

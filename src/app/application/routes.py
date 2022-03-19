@@ -50,7 +50,7 @@ def logout():
     # Remove the username from the session if it's there
     session.pop('logged_in', None)
     session.pop('username', None)
-    return redirect(url_for('resume'))
+    return redirect('/resume')
 
 
 @app.route("/config/")
@@ -98,16 +98,29 @@ def interface(room, iface_id):
         iface_vlan = iface['vlan']['dot1q_id']
         if int(request.form['vlan']) != iface_vlan:
             # Change the vlan
-            post_request(api_link, f"/api/v1.5/interface/{iface_id}/vlan/{request.form['vlan']}")
+            response = post_request(f"{api_link}interface/{iface_id}/vlan/{request.form['vlan']}", None, None)
+            #if response.status_code != 200:
+            #    print(response.status_code)
+            #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
         if request.form['status'] != iface_status:
             # Change the status
-            post_request(api_link, f"/api/v1.5/interface/{iface_id}/status/{'true' if request.form['status'] == 'up' else 'false'}")
+            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == 'up' else 'false'}", None, None)
+            #if response.status_code != 200:
+            #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+        return redirect('/resume/' + room)
     else:
         if session.get('logged_in'):
             return render_template('pages/t_interface.html', interface=iface, user=session.get('username'),
-                                       api=api, selected=selected_api, len=len(api))
+                                       api=api, room=api[selected_api], selected=selected_api, len=len(api))
         else:
             return render_template('errors/e_unauthorized.html', title='Unauthorized', api=api, len=len(api), selected=selected_api, user=session.get('username'))
+
+
+@app.route('/cache_reload/<selected_api>')
+def cache_reload(selected_api="Reseau-1"):
+    # Get request
+    response = get_request(f"http://{api[selected_api]}{api_base_link}rebuild")
+    return redirect('/resume/' + selected_api)
 
 
 # Error handlers.
@@ -163,13 +176,18 @@ def get_data(api_link, data_type):
 
     return content
 
+
+def get_request(api_link):
+    return urllib.request.urlopen(api_link)
+
+
 def post_request(api_link, data_type, data):
     """
     Allows to post data to the api
     :param api_link:
     """
-    url = f"{api_link}{data_type}"
     data = json.dumps(data).encode('utf8')
-    req = urllib.request.Request(url, data, headers={'content-type': 'application/json'})
+    print(api_link)
+    req = urllib.request.Request(api_link, data, headers={'content-type': 'application/json'})
     response = urllib.request.urlopen(req)
     return response

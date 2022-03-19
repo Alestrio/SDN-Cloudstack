@@ -38,10 +38,12 @@
     </div>
     {% if user %}
         <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle rounded bg-green-500"><a href="/cache_reload/{{ room }}">Refresh</a></button>
             <button class="px-5 text-sm md:text-xl align-middle"><a href="/logout">{{ user }}</a></button>
         </div>
     {%else%}
         <div class="flex-auto text-center">
+            <button class="px-5 text-sm md:text-xl align-middle rounded bg-green-500"><a href="/cache_reload/{{ room }}">Refresh</a></button>
             <button class="px-5 text-sm md:text-xl align-middle"><a href="/login">Login</a></button>
         </div>
     {%endif%}
