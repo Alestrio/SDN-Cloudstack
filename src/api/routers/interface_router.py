@@ -49,7 +49,7 @@ def get_interfaces_by_vlan(vlan_id: int):
 
 
 @router.post("/interfaces/{if_id}/vlan/{vlan_id}")
-def set_vlan_on_interface(if_id: int, vlan_id: int, user=Depends(get_current_admin_user)):
+def set_vlan_on_interface(if_id: int, vlan_id: int): #, user=Depends(get_current_admin_user)):
     # Set a vlan on an interface
     try:
         operations.set_interface_vlan(vlan_id, if_id)
@@ -61,7 +61,7 @@ def set_vlan_on_interface(if_id: int, vlan_id: int, user=Depends(get_current_adm
 
 # Route to set up or down an interface
 @router.post('/interface/{if_id}/state/{state}')
-def set_interface_state(if_id: int, state: bool, user=Depends(get_current_admin_user)):
+def set_interface_state(if_id: int, state: bool):  #, user=Depends(get_current_admin_user)):
     try:
         operations.set_interface_state(if_id, state)
     except Exception as e:
@@ -71,7 +71,7 @@ def set_interface_state(if_id: int, state: bool, user=Depends(get_current_admin_
 
 
 @router.post('/interface/{if_id}/description')
-def set_interface_description(if_id: int, body: str, user=Depends(get_current_admin_user)):
+def set_interface_description(if_id: int, body: str):  #, user=Depends(get_current_admin_user)):
     try:
         operations.set_interface_description(if_id, body)
     except Exception as e:
