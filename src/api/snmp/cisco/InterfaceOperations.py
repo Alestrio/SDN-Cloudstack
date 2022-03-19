@@ -109,7 +109,7 @@ class InterfaceOperations(AbstractOperations):
         """Set the state of an interface"""
         snmp_cmds.snmpset(ipaddress=self.ip, port=self.port, community=self.community,
                           oid=self.config['interfaces']['oids']['status'] + '.' + str(interface_id),
-                          value=('2' if state else '1'),
+                          value=('1' if state else '2'),
                           value_type='i')
         self.rebuild_cache_background()
 
