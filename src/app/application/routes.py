@@ -80,10 +80,7 @@ def config(room="Reseau-1", name=""):
 def delete_config(room, name):
     api_link = f"http://{api[room]}{api_base_link}"
     configs = get_configs(api_link)
-    for i in configs:
-        if str.lower(i['name']) == str.lower(name):
-            config_id = i['_id']
-            delete_request(api_link+"configs/{}".format(config_id))
+    delete_request(api_link+"configs/{}".format(name))
     return redirect('/config/'+room)
 
 
