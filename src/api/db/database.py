@@ -47,12 +47,12 @@ class Database:
         """
         return self.configs_collections.find_one({'_id': ObjectId(config_id)})
 
-    def delete_config(self, config_id):
+    def delete_config(self, config_name):
         """
         Delete a config from the database
-        :param config_id: Id of the config
+        :param config_name: Id of the config
         """
-        self.configs_collections.delete_one({'_id': config_id})
+        self.configs_collections.delete_one({'name': config_name})
 
     def get_brief_configs(self):
         """

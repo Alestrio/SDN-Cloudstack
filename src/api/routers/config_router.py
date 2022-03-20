@@ -75,11 +75,11 @@ def get_config(config_id: str):
     return config
 
 
-@router.delete("/configs/{config_id}")
-def delete_config(config_id: str):
+@router.delete("/configs/{config_name}")
+def delete_config(config_name: str):
     # Delete a config from the mongoDB database
     try:
-        db.delete_config(config_id)
+        db.delete_config(config_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while deleting configuration')
 
