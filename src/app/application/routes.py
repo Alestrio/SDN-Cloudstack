@@ -4,12 +4,14 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
+import re
+
 import yaml
 from application import app
 from flask import render_template, session, request, redirect, url_for
 import urllib
 import json
-
+import requests
 from yaml import Loader
 
 api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3', 'Test': 'test'}
@@ -166,6 +168,30 @@ def cache_reload(selected_api="Reseau-1"):
     return redirect('/resume/' + selected_api)
 
 
+@app.route('/send_config', methods=["POST"])
+def send_config():
+    dic = '{'+ request.form['config'][1:] +'\n}'
+    dic = json.loads(dic)
+    interfaces = []
+    vlans = []
+    trunks = []
+    for element in dic:
+        if re.match("interface.*", element):
+            interfaces.append(dic.get(element))
+        elif re.match("vlan.*", element):
+            vlans.append(dic.get(element))
+        elif re.match("trunk.*", element):
+            trunks.append(dic.get(element))
+
+    new_config = {"name": request.form['config_name'],
+                  "hostname": request.form['host_name'],
+                  "interfaces": interfaces,
+                  "vlans": vlans,
+                  "trunks": trunks}
+    x = requests.post(f"http://{api[new_config['hostname']]}{api_base_link}config", data=json.dumps(new_config))
+    print(x.text)
+    return redirect('/')
+
 # Error handlers.
 @app.errorhandler(404)
 def custom_error(error):
@@ -182,10 +208,6 @@ def custom_error(error):
     return render_template('errors/e_bad_request.html', title='Bad Request', selected=selected_api, api=api, len=len(api))
 
 # Get from api
-def get_trunks(api_link):
-    content = urllib.request.urlopen(f"{api_link}trunks")
-    content = json.load(content)
-    return content
 
 
 def get_vlans(api_link):

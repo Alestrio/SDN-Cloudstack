@@ -14,6 +14,6 @@ function ShowAndHide(sectionName) {
         x.style.display = 'none';
     }
 }
-function setConfig_input(config) {
-    document.getElementById("config_input").value += JSON.stringify(config, null, '\t') + ",\n";
+function setConfig_input(config, data_type) {
+    document.getElementById("config_input").value += ",\n\"" + data_type +"\":" + JSON.stringify(config, null, '\t');
 }
