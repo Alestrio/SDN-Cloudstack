@@ -2,23 +2,29 @@
 {%block content%}
 {{super()}}
 <!-- Config list with an apply button, and a store current config button -->
+<script src="{{url_for('static', filename='js/config.js')}}"></script>
 <div class="grid md:grid-cols-2 grid-rows-2 flex flex-grow md:mt-5">
     <div class="m-2 p-2 shadow-lg">
         <h1 class="text-2xl font-bold text-center">Actions disponibles</h1>
-        <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                onclick="">Apply</button>
+        <h2 class="text-xl font-bold text-center" id="selected_config"></h2>
         <div class="flex flex-row">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full"
-                onclick="">Save current as</button>
-            <input type="text" class="bg-blue-100 text-white font-bold py-2 px-4 rounded"
-                onclick="">
+            <form id="apply" class="w-1/2 m-2" method="post"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded w-full" type="submit">
+                Appliquer</button></form>
+            <form id="delete" class="w-1/2 m-2" method="post"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 rounded w-full" type="submit">
+                Supprimer</button></form>
         </div>
+        <form class="flex flex-row">
+            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-4 m-2 rounded w-1/2"
+                onclick="">Enregister configuration courante en tant que : </button>
+            <input type="text" class="bg-blue-100 text-black font-bold py-1 px-4 m-2 rounded w-1/2"
+                onclick="">
+        </form>
     </div>
     <div class="w-full m-2 p-2 shadow-lg">
         <h1 class="text-2xl font-bold text-center">Configurations disponibles</h1>
         {% for config in configs %}
-            <button class="bg-green-200 hover:bg-green-300 text-white font-bold py-2 px-4 rounded-full"
-                    onclick="">{{config.name}}</button>
+            <button class="bg-green-300 hover:bg-green-400 text-white font-bold py-2 px-4 rounded-full"
+                    onclick="setCurrentConfig('{{ room }}', '{{ config.name }}')">{{config.name}}</button>
         {% endfor %}
     </div>
 </div>

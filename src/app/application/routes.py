@@ -63,9 +63,28 @@ def logout():
 
 @app.route("/config/")
 @app.route("/config/<room>")
-def config(room="Reseau-1"):
-    return render_template('pages/t_config.html', title='Config', room=room, api=api, selected=selected_api,
-                           len=len(api), user=session.get('username'), select_paths=select_paths)
+@app.route("/config/<room>/<name>", methods=['POST'])
+def config(room="Reseau-1", name=""):
+    selected_api = room
+    api_link = f"http://{api[room]}{api_base_link}"
+    configs = get_configs(api_link)
+    if request.method == 'POST':
+        config_id = configs[name]['_id']
+        post_request(api_link+"configs/apply/{}".format(config_id), None, None)
+    else:
+        return render_template('pages/t_config.html', title='Config', room=room, api=api, selected=selected_api,
+                               len=len(api), user=session.get('username'), select_paths=select_paths, configs=configs)
+
+
+@app.route('/config/delete/<room>/<name>', methods=['POST'])
+def delete_config(room, name):
+    api_link = f"http://{api[room]}{api_base_link}"
+    configs = get_configs(api_link)
+    for i in configs:
+        if str.lower(i['name']) == str.lower(name):
+            config_id = i['_id']
+            delete_request(api_link+"configs/{}".format(config_id))
+    return redirect('/config/'+room)
 
 
 @app.route("/config-otg/<room>")
@@ -184,6 +203,12 @@ def get_interfaces(api_link):
     return content
 
 
+def get_configs(api_link):
+    content = urllib.request.urlopen(f"{api_link}configs")
+    content = json.load(content)['configs']
+    return content
+
+
 def get_data(api_link, data_type):
     content = urllib.request.urlopen(f"{api_link}{data_type}")
     content = json.load(content)
@@ -215,5 +240,16 @@ def post_request(api_link, data_type, data):
     data = json.dumps(data).encode('utf8')
     print(api_link)
     req = urllib.request.Request(api_link, data, headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response
+
+
+def delete_request(api_link):
+    """
+    Allows to delete data from the api
+    :param api_link:
+    """
+    req = urllib.request.Request(api_link)
+    req.method = 'DELETE'
     response = urllib.request.urlopen(req)
     return response
