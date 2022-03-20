@@ -3,16 +3,16 @@
 {{super()}}
 <!--- include script for this page -->
 <script src="{{url_for('static', filename='js/config_otg.js')}}"></script>
-<div class= "content flex flex-grow h-full w-full flex-col md:flex-row">
+<div class= "content flex flex-grow h-5/6 w-full flex-col md:flex-row mb-5 p-5">
     <div class="border-2 w-1\/2 w-full flex-grow flex md:h-full flex-col sm:h-2/5" >
         <div class="h-full w-full p-1"><textarea class="resize-y h-full border-black border-2 w-full rounded-md" id="config_input" name="config"></textarea></div>
         <div class="h-1/6 w-full items-center text-center m-auto"><button onclick="" class="hover:bg-blue-100 px-2 py-2 rounded-md">Send-config</button></div>
     </div>
-    <div class="border-2 flex-grow w-1\/2 w-full md:h-full h-3/5">
-        <div class="text-center m-auto w-full"><button class="px-1 m-auto" onclick="ShowAndHide('interface')">Interfaces</button><button class="px-1 m-auto" onclick="ShowAndHide('vlans')">Vlans</button><button class="px-1 m-auto" onclick="ShowAndHide('trunks')">Trunks</button></div>
-        <div class="flex flex-col w-full h-full">
-            <div class="h-2\/5 w-full h-full overflow-x-scroll border-1" style="display: none;" id=interface>
-                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+    <div class="border-2 flex-grow w-1\/2 w-full md:h-full h-3/5 overflow-y-scroll">
+        <div class="text-center m-auto w-full h-8"><button class="px-1 m-auto" onclick="ShowAndHide('interface')">Interfaces</button><button class="px-1 m-auto" onclick="ShowAndHide('vlans')">Vlans</button><button class="px-1 m-auto" onclick="ShowAndHide('trunks')">Trunks</button></div>
+        <div class="w-full object-fill">
+            <div class="h-2\/5 w-full h-full block flex row" style="display: none;" id=interface>
+                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto block">
                     <thead>
                     <tr>
                         <th colspan="3">Interfaces</th>
@@ -38,8 +38,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="h-1\/5 w-full h-full overflow-x-scroll "  id=vlans style="display: none;">
-                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto overflow-scroll">
+            <div class="h-1\/5 w-full h-full block flex row"  id=vlans style="display: none;">
+                <table class="table-fixed w-full h-full border-collapse border border-gray-400 m-auto block justify-center">
                     <thead>
                     <tr>
                         <th colspan="2">Vlans</th>
@@ -61,8 +61,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="h-2/5 w-full h-full overflow-scroll flex row" id=trunks style="display: none;">
-                <table class="h-auto w-full overflow-scroll border-collapse border border-gray-400 m-auto">
+            <div class="h-2/5 w-full h-full block flex row" id=trunks style="display: none;">
+                <table class="h-auto w-full border-collapse border border-gray-400 m-auto">
                     <thead>
                     <tr>
                         <th colspan="4">Trunks</th>

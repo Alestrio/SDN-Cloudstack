@@ -1,9 +1,9 @@
 {% extends 'pages/t_layout.html' %}
 {%block content%}
     {{super()}}
-    <div class="overflow-scroll w-full items-center object-fill">
+    <div class="items-center m-5">
         <h1 class="text-4xl center p-4 shadow-lg text-center bg-local">Résumé et état des ports de la salle :</h1>
-        <div class="grid grid-cols-3 md:grid-cols-6 xl:grid-cols-12 w-full p-2 m-4 gap-2 overflow-x-scroll">
+        <div class="grid grid-cols-3 md:grid-cols-6 xl:grid-cols-12 p-2 m-4 gap-2">
             {% for intf in interfaces %}
                 <a href="/interface/{{ room }}/{{ intf.port_id }}">
                     <div class="w-28 object-contain block flex flex-col items-center justify-center bg-gray-300
