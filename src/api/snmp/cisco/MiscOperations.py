@@ -9,6 +9,7 @@ import ipaddress
 import beaker.cache
 import snmp_cmds
 from beaker.cache import cache_region
+from pysnmp.error import PySnmpError
 
 from src.api.models import CdpNeighbor
 from src.api.snmp.AbstractOperations import AbstractOperations
@@ -23,10 +24,18 @@ class MiscOperations(AbstractOperations):
         beaker.cache.region_invalidate(self.get_uptime, 'api_data')
 
     def rebuild_cache(self):
-        self.invalidate_cache()
-        self.get_cdp_neighbors()
-        self.get_hostname()
-        self.get_uptime()
+        try:
+            self.invalidate_cache()
+            self.get_cdp_neighbors()
+            self.get_hostname()
+            self.get_uptime()
+        except snmp_cmds.exceptions.SNMPTimeout as e:
+            print('SNMPTimeout')
+        # except error from pysnmp
+        except PySnmpError as e:
+            print('SNMPTimeout')
+        except Exception as e:
+            print(e)
 
     def __init__(self, ip, port, community, config):
         super().__init__(ip, port, community, config)

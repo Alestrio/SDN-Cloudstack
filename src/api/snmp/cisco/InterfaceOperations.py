@@ -7,6 +7,7 @@
 import beaker
 import snmp_cmds
 from beaker.cache import cache_region
+from pysnmp.error import PySnmpError
 
 from src.api.models import Interface, Vlan
 from src.api.snmp.AbstractOperations import AbstractOperations
@@ -21,8 +22,16 @@ class InterfaceOperations(AbstractOperations):
 
     def rebuild_cache(self):
         """Rebuild the cache"""
-        self.invalidate_cache()
-        self.get_interfaces()
+        try:
+            self.invalidate_cache()
+            self.get_interfaces()
+        except snmp_cmds.exceptions.SNMPTimeout as e:
+            print('SNMPTimeout')
+        # except error from pysnmp
+        except PySnmpError as e:
+            print('SNMPTimeout')
+        except Exception as e:
+            print(e)
 
     def __init__(self, ip, port, community, config, vlan_operations: VlanOperations):
         super().__init__(ip, port, community, config)
