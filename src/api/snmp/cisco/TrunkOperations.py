@@ -9,6 +9,7 @@ from typing import Optional
 import beaker.cache
 import snmp_cmds
 from beaker.cache import cache_region
+from pysnmp.error import PySnmpError
 
 from src.api.models import TrunkBrief, Trunk
 from src.api.snmp.AbstractOperations import AbstractOperations
@@ -23,8 +24,16 @@ class TrunkOperations(AbstractOperations):
 
     def rebuild_cache(self):
         """rebuilds cache"""
-        self.invalidate_cache()
-        self.get_trunks()
+        try:
+            self.invalidate_cache()
+            self.get_trunks()
+        except snmp_cmds.exceptions.SNMPTimeout as e:
+            print('SNMPTimeout')
+        # except error from pysnmp
+        except PySnmpError as e:
+            print('SNMPTimeout')
+        except Exception as e:
+            print(e)
 
     def __init__(self, ip, port, community, config, interface_operations: InterfaceOperations,
                  vlan_operations: VlanOperations):
@@ -75,13 +84,13 @@ class TrunkOperations(AbstractOperations):
                         # append the id of the vlan, the index of the bin string
                         tr_tagged_vlans.append(j)
 
-            trunks.append(Trunk(
-                interface=interface,
-                domain=domains[i],
-                native_vlan=tr_native_vlan,
-                tagged_vlans=tr_tagged_vlans,
-                status=statuses[i]
-            )) if encapsulations[i] == '4' else None
+                trunks.append(Trunk(
+                    interface=interface,
+                    domain=domains[i],
+                    native_vlan=tr_native_vlan,
+                    tagged_vlans=tr_tagged_vlans,
+                    status=statuses[i]
+                )) if encapsulations[i] == '4' else None
 
         return trunks
 

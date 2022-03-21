@@ -4,8 +4,10 @@
 #  Alexis LEBEL, Elwan LEFEVRE, Laurent HUSSENET
 #  This code belongs exclusively to its authors, use, redistribution or
 #  reproduction forbidden except with authorization from the authors.
-
+import pysnmp
+import snmp_cmds
 from fastapi import APIRouter, HTTPException
+from pysnmp.error import PySnmpError
 
 from src.api.routers import ROUTE_PREFIX
 from src.api.routers import misc_operations as operations
@@ -23,9 +25,12 @@ def get_cdp_neighbors():
     # Return the CDP neighbors from the switch
     try:
         neighbors = operations.get_cdp_neighbors()
+    except snmp_cmds.exceptions.SNMPTimeout as e:
+        raise HTTPException(status_code=500, detail='SNMP timeout while getting CDP neighbors')
+    except PySnmpError as e:
+        raise HTTPException(status_code=500, detail='SNMP error while getting CDP neighbors')
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
-
     return neighbors
 
 
@@ -34,8 +39,12 @@ def get_hostname():
     # Return the hostname of the switch
     try:
         hostname = operations.get_hostname()
+    except snmp_cmds.exceptions.SNMPTimeout as e:
+        raise HTTPException(status_code=500, detail='SNMP timeout while getting CDP neighbors')
+    except PySnmpError as e:
+        raise HTTPException(status_code=500, detail='SNMP error while getting CDP neighbors')
     except Exception as e:
-        raise HTTPException(status_code=500, detail='Server error while getting hostname')
+        raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
 
     return {'hostname': hostname}
 
@@ -45,7 +54,10 @@ def get_uptime():
     # Return the uptime of the switch
     try:
         uptime = operations.get_uptime()
+    except snmp_cmds.exceptions.SNMPTimeout as e:
+        raise HTTPException(status_code=500, detail='SNMP timeout while getting CDP neighbors')
+    except PySnmpError as e:
+        raise HTTPException(status_code=500, detail='SNMP error while getting CDP neighbors')
     except Exception as e:
-        raise HTTPException(status_code=500, detail='Server error while getting uptime')
-
+        raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
     return {'uptime': uptime}
