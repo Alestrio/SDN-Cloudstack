@@ -6,6 +6,7 @@
 #  reproduction forbidden except with authorization from the authors.
 import re
 
+import werkzeug
 import yaml
 from application import app
 from flask import render_template, session, request, redirect, url_for
@@ -107,7 +108,10 @@ def resume(room="Reseau-1"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     if session.get(api[room]) is None:
-        session[api[room]] = {'interfaces': get_interfaces(api_link)}
+        try:
+            session[api[room]] = {'interfaces': get_interfaces(api_link)}
+        except Exception as e:
+            raise werkzeug.exceptions.InternalServerError(e)
     return render_template('pages/t_resume.html', interfaces=session[api[room]]['interfaces'], room=room, user=session.get('username'),
                            api=api, selected=selected_api, len=len(api), select_paths=select_paths)
 
@@ -206,6 +210,11 @@ def custom_error(error):
 @app.errorhandler(400)
 def custom_error(error):
     return render_template('errors/e_bad_request.html', title='Bad Request', selected=selected_api, api=api, len=len(api))
+
+
+@app.errorhandler(500)
+def custom_error(error):
+    return render_template('errors/e_internal_server_error.html', title='Internal Server Error', selected=selected_api, api=api, len=len(api))
 
 # Get from api
 
