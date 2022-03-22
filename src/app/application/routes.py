@@ -15,8 +15,8 @@ import json
 import requests
 from yaml import Loader
 
-api = {'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3', 'Test': 'test'}
-selected_api = 'Reseau-1'
+api = {'Test': 'test', 'Reseau-1': 'r1', 'Reseau-2': 'r2', 'Reseau-3': 'r3'}
+selected_api = 'Test'
 api_base_link = ".api.sdn.chalons.univ-reims.fr/api/v1.5/"
 
 select_paths = ['/', '/resume/', '/config/', '/trunks/', '/config-otg/']
@@ -67,13 +67,15 @@ def logout():
 @app.route("/config/")
 @app.route("/config/<room>")
 @app.route("/config/<room>/<name>", methods=['POST'])
-def config(room="Reseau-1", name=""):
+def config(room="Test", name=""):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     configs = get_configs(api_link)
     if request.method == 'POST':
-        config_id = configs[name]['_id']
-        post_request(api_link+"configs/apply/{}".format(config_id), None, None)
+        if name == "":
+            return redirect('/config/'+room)
+        post_request(api_link+"configs/apply/{}".format(name), None)
+        return redirect('/config/'+room)
     else:
         return render_template('pages/t_config.html', title='Config', room=room, api=api, selected=selected_api,
                                len=len(api), user=session.get('username'), select_paths=select_paths, configs=configs)
@@ -89,7 +91,7 @@ def delete_config(room, name):
 
 @app.route("/config-otg/<room>")
 @app.route("/config-otg/")
-def config_otg(room="Reseau-1"):
+def config_otg(room="Test"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     print(api_link)
@@ -104,7 +106,7 @@ def config_otg(room="Reseau-1"):
 @app.route("/resume/")
 @app.route("/resume/<room>")
 @app.route("/<room>")
-def resume(room="Reseau-1"):
+def resume(room="Test"):
     selected_api = room
     api_link = f"http://{api[room]}{api_base_link}"
     if session.get(api[room]) is None:
@@ -132,7 +134,7 @@ def interface(room, iface_id):
         iface_vlan = iface['vlan']['dot1q_id']
         if int(request.form['vlan']) != iface_vlan:
             # Change the vlan
-            response = post_request(f"{api_link}interfaces/{iface_id}/vlan/{request.form['vlan']}", None, None)
+            response = post_request(f"{api_link}interfaces/{iface_id}/vlan/{request.form['vlan']}", None)
             iface['vlan']['dot1q_id'] = int(request.form['vlan'])
             #if response.status_code != 200:
             #    print(response.status_code)
@@ -237,6 +239,12 @@ def get_configs(api_link):
     return content
 
 
+def get_configs(api_link):
+    content = urllib.request.urlopen(f"{api_link}configs")
+    content = json.load(content)['configs']
+    return content
+
+
 def get_data(api_link, data_type):
     content = urllib.request.urlopen(f"{api_link}{data_type}")
     content = json.load(content)
@@ -260,14 +268,26 @@ def get_request(api_link):
     return urllib.request.urlopen(api_link)
 
 
-def post_request(api_link, data_type, data):
+def post_request(api_link, data):
     """
     Allows to post data to the api
     :param api_link:
     """
+    print(api_link)
     data = json.dumps(data).encode('utf8')
     print(api_link)
     req = urllib.request.Request(api_link, data, headers={'content-type': 'application/json'})
+    response = urllib.request.urlopen(req)
+    return response
+
+
+def delete_request(api_link):
+    """
+    Allows to delete data from the api
+    :param api_link:
+    """
+    req = urllib.request.Request(api_link)
+    req.method = 'DELETE'
     response = urllib.request.urlopen(req)
     return response
 
