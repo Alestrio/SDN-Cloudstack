@@ -1,0 +1,12 @@
+{% extends 'pages/t_layout.html' %}
+{%block content%}
+{{super()}}
+<div class= "content flex-col w-full h-full">
+    <div class = "m-auto text-center text-black text-2xl">
+        Ooops! Something went wrong. <br>
+        Maybe the switch is off, check the connection or try again later.
+        <img class="m-auto object-contain h-96 w-150 object-center" src="https://github.com/Alestrio/AmazRT/blob/general-dev/application/static/img/not_found.png?raw=true" alt="not-found.jpg">
+        <a href="/" class="text-white bg-gray-400 rounded-md px-3 py-1 text-m font-medium">HOME</a>
+    </div>
+</div>
+{%endblock%}
