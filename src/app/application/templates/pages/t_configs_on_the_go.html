@@ -4,12 +4,11 @@
 <!--- include script for this page -->
 <script src="{{url_for('static', filename='js/config_otg.js')}}"></script>
 <div class= "content flex flex-grow h-5/6 w-full flex-col md:flex-row mb-5 p-5">
-    <div class="border-2 w-1\/2 w-full flex-grow flex md:h-full flex-col sm:h-2/5" >
-        <form class="h-full w-full p-1" action="/send_config" id="config_form" method="post">
+    <div class="border-2 w-1\/2 w-full flex-grow flex md:h-full flex-col h-2/5" >
+        <form class="md:h-full h-5/6 w-full p-1 flex flex-col" action="/send_config" id="config_form" method="post">
             <div class="h-full w-full p-1"><textarea class="resize-y h-full border-black border-2 w-full rounded-md" form="config_form" id="config_input" name="config"></textarea></div>
             <div class="h-1/6 w-full items-center text-center p-1 m-1">
-                 Config Name : <input class="border rounded" type="text" name="config_name">
-
+                 Config Name : <input class="border rounded" type="text" name="config_name" id="configName" onchange="configNameChanged()">
                 <select name="host_name" id="host_name" form="config_form">
                     {%for room in api%}
                         {% if selected == room %}
@@ -19,7 +18,7 @@
                         {%endif%}
                     {%endfor%}
                 </select>
-                <input class="border rounded p-1 m-1" type="submit" value="Send">
+                <input class="border rounded p-1 m-1 hover:bg-green-500 bg-green-300" disabled=disabled id="submit" type="submit" value="Send">
             </div>
         </form>
     </div>

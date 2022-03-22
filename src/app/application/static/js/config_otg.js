@@ -17,3 +17,9 @@ function ShowAndHide(sectionName) {
 function setConfig_input(config, data_type) {
     document.getElementById("config_input").value += ",\n\"" + data_type +"\":" + JSON.stringify(config, null, '\t');
 }
+
+function configNameChanged(){
+    let configName = document.getElementById("configName").value;
+    let submitButton = document.getElementById("submit");
+    submitButton.disabled = configName.length <= 0;
+}
