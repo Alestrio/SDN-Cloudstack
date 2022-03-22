@@ -115,13 +115,13 @@ def apply_config(config_id: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while getting configuration')
 
-    try:
-        operations.translate_config_and_set_to_switch(Config.from_dict(config))
-    except snmp_cmds.exceptions.SNMPTimeout as e:
+    #try:
+    operations.translate_config_and_set_to_switch(Config.from_dict(config))
+    """except snmp_cmds.exceptions.SNMPTimeout as e:
         raise HTTPException(status_code=500, detail='SNMP timeout while getting CDP neighbors')
     except PySnmpError as e:
         raise HTTPException(status_code=500, detail='SNMP error while getting CDP neighbors')
     except Exception as e:
-        raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
+        raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')"""
 
     return {'message': 'Configuration applied'}
