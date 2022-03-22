@@ -73,11 +73,11 @@ def get_running_config_cisco():
         raise HTTPException(status_code=500, detail='Server error while getting CDP neighbors')
 
 
-@router.get("/configs/{config_id}")
-def get_config(config_id: str):
+@router.get("/configs/{config_name}")
+def get_config(config_name: str):
     # Return a config from the mongoDB database
     try:
-        config = db.get_config(config_id)
+        config = db.get_config(config_name)
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while getting configuration')
 
@@ -106,11 +106,11 @@ def get_brief_configs():
     return {'configs': configs}
 
 
-@router.post("/configs/apply/{config_id}")
-def apply_config(config_id: str):
+@router.post("/configs/apply/{config_name}")
+def apply_config(config_name: str):
     # Apply a config from the mongoDB database to the switch
     try:
-        config = db.get_config(config_id)
+        config = db.get_config(config_name)
         print(config)
     except Exception as e:
         raise HTTPException(status_code=500, detail='Server error while getting configuration')

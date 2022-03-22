@@ -39,13 +39,13 @@ class Database:
         """
         self.configs_collections.insert_one(config)
 
-    def get_config(self, config_id):
+    def get_config(self, name):
         """
         Get a config from the database
-        :param config_id: Id of the config
+        :param name: name of the config
         :return: Config
         """
-        return self.configs_collections.find_one({'_id': ObjectId(config_id)})
+        return self.configs_collections.find_one({'name': name})
 
     def delete_config(self, config_name):
         """
