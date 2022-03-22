@@ -40,6 +40,7 @@ class ConfigOperations(AbstractOperations):
         for interface in config.interfaces:
             if interface.vlan:
                 self.interface_operations.set_interface_vlan(interface.vlan.dot1q_id, interface.port_id)
+            self.interface_operations.set_interface_state(interface.port_id, True if interface.status == "up" else False)
         for trunk in config.trunks:
             self.trunk_operations.set_trunk(trunk.interface.port_id, trunk.tagged_vlans, trunk.native_vlan.dot1q_id)
         #self.misc_operations.set_hostname(config.hostname)
