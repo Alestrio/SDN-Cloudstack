@@ -14,3 +14,6 @@ PyYAML~=6.0
 uvicorn~=0.15.0
 Beaker~=1.11.0
 pysmi~=0.3.4
+Werkzeug~=2.0.2
+requests~=2.27.1
+Flask~=2.0.2
