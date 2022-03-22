@@ -8,6 +8,7 @@ import json
 
 import pymongo
 import yaml
+from bson import ObjectId
 
 
 class Database:
@@ -38,17 +39,28 @@ class Database:
         """
         self.configs_collections.insert_one(config)
 
-    def get_config(self, config_id):
+    def get_config(self, name):
         """
         Get a config from the database
-        :param config_id: Id of the config
+        :param name: name of the config
         :return: Config
         """
-        return self.configs_collections.find_one({'_id': config_id})
+        return self.configs_collections.find_one({'name': name})
 
-    def delete_config(self, config_id):
+    def delete_config(self, config_name):
         """
         Delete a config from the database
-        :param config_id: Id of the config
+        :param config_name: Id of the config
         """
-        self.configs_collections.delete_one({'_id': config_id})
+        self.configs_collections.delete_one({'name': config_name})
+
+    def get_brief_configs(self):
+        """
+        Get the configs stored in database
+        :return: List of configs
+        """
+        configs_names = []
+        for config in self.configs_collections.find({}):
+            config['_id'] = str(config['_id']).replace('ObjectId(', '').replace(')', '')
+            configs_names.append(config['name'])
+        return configs_names

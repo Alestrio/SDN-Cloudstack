@@ -17,3 +17,10 @@ pysmi~=0.3.4
 Werkzeug~=2.0.2
 requests~=2.27.1
 Flask~=2.0.2
+snmp_cmds~=1.0
+
+passlib~=1.7.4
+python-jose
+starlette~=0.16.0
+python-multipart~=0.0.5
+bcrypt~=3.2.0
