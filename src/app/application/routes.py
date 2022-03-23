@@ -142,7 +142,7 @@ def interface(room, iface_id):
         if request.form['status'] != iface_status:
             # Change the status
             print(request.form['status'])
-            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == '1' else 'false'}", None, None)
+            response = post_request(f"{api_link}interface/{iface_id}/state/{'true' if request.form['status'] == '1' else 'false'}", None)
             iface['status'] = 'up' if request.form['status'] == '1' else 'down'
             #if response.status_code != 200:
             #    return render_template('errors/e_interface.html', title='500', api=api, len=len(api), selected=selected_api, user=session.get('username'))
