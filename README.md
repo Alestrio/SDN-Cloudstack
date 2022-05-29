@@ -4,7 +4,7 @@
 
 An API meant to be used for Software Defined Network
 
-Documentation can be found on http://doc.sdn.chalons.univ-reims.fr
+Documentation can be found on http://doc.sdn.chalons.univ-reims.fr / https://cloudstack.alexislebel.fr
 
 Big thanks to our tutor Laurent Hussenet, as well as @PtitNost and @HakkaOfDev for their help and support
 
